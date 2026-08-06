@@ -29,3 +29,5 @@ add_executable(quilldb_ts_benchmark src/cli/tick_benchmark.cpp ${CORE_SOURCES})
 add_executable(quilldb_flush_benchmark src/cli/flush_benchmark.cpp ${CORE_SOURCES})
 
 add_executable(quilldb_query_benchmark src/cli/query_benchmark.cpp ${CORE_SOURCES})
+
+add_executable(quilldb_vwap_benchmark src/cli/vwap_benchmark.cpp ${CORE_SOURCES})
