@@ -23,5 +23,23 @@ int main() {
     std::cout << "All internal and leaf nodes split correctly without segfaults.\n";
     std::cout << "=====================================\n";
 
+    std::cout << "\nTesting Range Scan: BETWEEN 500 AND 550...\n";
+    
+    auto results = tree.searchRange(500, 550);
+    
+    std::cout << "Rows Found: " << results.size() << "\n";
+    if (results.size() > 0) {
+        std::cout << "First Row ID: " << results.front() << "\n";
+        std::cout << "Last Row ID: " << results.back() << "\n";
+    }
+
+    // Verify correctness
+    assert(results.size() == 51); // 500 to 550 inclusive is 51 rows
+    assert(results.front() == 5000); // 500 * 10
+    assert(results.back() == 5500);  // 550 * 10
+
+    std::cout << "Range Scan passed! Horizontal Leaf Traversal is working.\n";
+    std::cout << "=====================================\n";
+
     return 0;
 }

@@ -86,6 +86,19 @@ public:
             return {true, mid_key, new_internal};
         }
     }
+
+    // NEW: Helper to drop straight down to the correct leaf
+    static std::shared_ptr<LeafNode> findLeaf(std::shared_ptr<BTreeNode> node, int64_t key) {
+        while (!node->is_leaf) {
+            auto internal = std::static_pointer_cast<InternalNode>(node);
+            // Find which child pointer to follow
+            auto it = std::upper_bound(internal->keys.begin(), internal->keys.end(), key);
+            size_t child_index = std::distance(internal->keys.begin(), it);
+            node = internal->children[child_index];
+        }
+        return std::static_pointer_cast<LeafNode>(node);
+    }
+
 };
 
 // The Public API
@@ -100,6 +113,34 @@ void BTree::insert(int64_t key, uint64_t value) {
         new_root->children.push_back(result.right_node);
         root_ = new_root;
     }
+}
+
+// NEW: The Horizontal Range Scan
+std::vector<uint64_t> BTree::searchRange(int64_t start_key, int64_t end_key) {
+    std::vector<uint64_t> results;
+    if (!root_) return results;
+
+    // 1. Drop down the tree $O(\log N)$ to find the starting leaf
+    auto leaf = BTreeImpl::findLeaf(root_, start_key);
+
+    // 2. Slide horizontally across the linked leaves
+    while (leaf != nullptr) {
+        for (size_t i = 0; i < leaf->keys.size(); ++i) {
+            // If we've passed the upper bound, we are completely done!
+            if (leaf->keys[i] > end_key) {
+                return results; 
+            }
+            
+            // If it's within our range, collect the value (Row ID)
+            if (leaf->keys[i] >= start_key) {
+                results.push_back(leaf->values[i]);
+            }
+        }
+        // Move to the next leaf node in the chain
+        leaf = leaf->next_leaf; 
+    }
+
+    return results;
 }
 
 } // namespace quill

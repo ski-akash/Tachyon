@@ -60,6 +60,9 @@ public:
     }
 
     void insert(int64_t key, uint64_t value);
+    
+    // NEW: Declare the range scan function
+    std::vector<uint64_t> searchRange(int64_t start_key, int64_t end_key);
 };
 
 } // namespace quill
