@@ -14,6 +14,7 @@ enum class TokenType {
     IDENTIFIER, // e.g., table names, column names
     NUMBER,     // e.g., 42, 3.14
     STRING,     // e.g., 'hello'
+    STRING_LITERAL,
 
     // Operators
     PLUS,       // +
@@ -26,6 +27,10 @@ enum class TokenType {
     GROUP,
     BY,
     EXPLAIN,
+
+    // Time Series Tokens 
+    BETWEEN, 
+    AND,
 
     // Syntax
     COMMA,      // ,

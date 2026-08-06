@@ -104,6 +104,21 @@ public:
     }
 };
 
+// NEW: Time-range filtering node
+class BetweenExpression : public Expression {
+public:
+    std::shared_ptr<Expression> left;   // e.g., 'time'
+    std::shared_ptr<Expression> lower;  // e.g., '1704067200500000000'
+    std::shared_ptr<Expression> upper;  // e.g., '1704067200510000000'
+
+    BetweenExpression(std::shared_ptr<Expression> l, std::shared_ptr<Expression> low, std::shared_ptr<Expression> up)
+        : left(std::move(l)), lower(std::move(low)), upper(std::move(up)) {}
+
+    std::string toString() const override {
+        return left->toString() + " BETWEEN " + lower->toString() + " AND " + upper->toString();
+    }
+};
+
 // Represents a full SELECT query
 class SelectStatement : public Statement {
 public:

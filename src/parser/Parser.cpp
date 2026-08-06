@@ -67,25 +67,30 @@ std::shared_ptr<Statement> Parser::parseExplainStatement() {
     return nullptr;
 }
 
-// NEW: Parses basic binary expressions like "id = 42"
+// NEW: Parses basic expressions and the BETWEEN operator
 std::shared_ptr<Expression> Parser::parseExpression() {
-    // 1. Grab the left side (e.g., 'users.id')
-    auto left = std::make_shared<Identifier>(current_token_.literal);
-    nextToken(); 
+    // Grab the left side (e.g., 'time') using your existing helper!
+    auto left = parseColumnOrFunction(); 
 
-    // 2. Grab the operator (e.g., '=')
-    std::string op = current_token_.literal;
-    nextToken(); 
-
-    // 3. Grab the right side. It could be a Number (42) or an Identifier (orders.user_id)
-    std::shared_ptr<Expression> right;
-    if (current_token_.type == TokenType::NUMBER) {
-        right = std::make_shared<NumberLiteral>(current_token_.literal);
-    } else {
-        right = std::make_shared<Identifier>(current_token_.literal);
+    // Intercept the Time-Series BETWEEN operator
+    if (currentTokenIs(TokenType::BETWEEN)) {
+        nextToken(); // Consume 'BETWEEN'
+        
+        auto lower = parseColumnOrFunction(); // Get the lower bound
+        
+        if (!currentTokenIs(TokenType::AND)) {
+            throw std::runtime_error("Parser Error: Expected 'AND' after 'BETWEEN' lower bound.");
+        }
+        nextToken(); // Consume 'AND'
+        
+        auto upper = parseColumnOrFunction(); // Get the upper bound
+        
+        return std::make_shared<BetweenExpression>(left, lower, upper);
     }
-    
-    return std::make_shared<BinaryExpression>(std::move(left), std::move(op), std::move(right));
+
+    // ... existing operator parsing (e.g., =, <, >) ...
+    // If you have logic for 'id = 42', it goes here.
+    return left;
 }
 
 // NEW: Build the Join AST Node
@@ -107,25 +112,44 @@ std::shared_ptr<JoinClause> Parser::parseJoinClause() {
     return std::make_shared<JoinClause>(std::move(joinTable), std::move(condition));
 }
 
-// NEW: Parse either a regular column (user_id) or a function call (SUM(amount))
+// NEW: Parse a regular column or a multi-argument function call
 std::shared_ptr<Expression> Parser::parseColumnOrFunction() {
     std::string name = current_token_.literal;
     nextToken(); // Advance past the name
 
     // If the next token is a '(', this is a function call!
-    if (current_token_.type == TokenType::LPAREN) {
+    if (currentTokenIs(TokenType::LPAREN)) {
         nextToken(); // Advance past '('
         
         std::vector<std::shared_ptr<Expression>> args;
         
-        // Grab the argument inside the parentheses (e.g., 'amount')
-        if (current_token_.type == TokenType::IDENTIFIER || current_token_.type == TokenType::STAR) {
-            args.push_back(std::make_shared<Identifier>(current_token_.literal));
-            nextToken();
+        // Loop to grab all arguments separated by commas
+        while (!currentTokenIs(TokenType::RPAREN) && !currentTokenIs(TokenType::END_OF_FILE)) {
+            // We accept identifiers, stars, and string literals (for things like '1m')
+            if (currentTokenIs(TokenType::IDENTIFIER) || 
+                currentTokenIs(TokenType::STAR) || 
+                currentTokenIs(TokenType::STRING_LITERAL)) {
+                
+                args.push_back(std::make_shared<Identifier>(current_token_.literal));
+                nextToken(); // Consume the argument
+            }
+
+            // If there's a comma, consume it and continue the loop
+            if (currentTokenIs(TokenType::COMMA)) {
+                nextToken();
+            }
         }
 
-        if (current_token_.type == TokenType::RPAREN) {
+        if (currentTokenIs(TokenType::RPAREN)) {
             nextToken(); // Advance past ')'
+        }
+        
+        // Optional: Strict Validation for Time-Series Functions
+        if (name == "TIME_BUCKET" && args.size() != 2) {
+            throw std::runtime_error("Parser Error: TIME_BUCKET requires 2 arguments (column, interval).");
+        }
+        if (name == "VWAP" && args.size() != 2) {
+            throw std::runtime_error("Parser Error: VWAP requires 2 arguments (price_col, size_col).");
         }
         
         return std::make_shared<FunctionCall>(name, args);
@@ -177,11 +201,13 @@ std::shared_ptr<SelectStatement> Parser::parseSelectStatement() {
             nextToken(); // Move past 'BY'
 
             // Parse the grouping columns until the query ends
-            while (current_token_.type != TokenType::SEMICOLON && current_token_.type != TokenType::END_OF_FILE) {
-                if (current_token_.type == TokenType::IDENTIFIER) {
-                    stmt->groupBy.push_back(std::make_shared<Identifier>(current_token_.literal));
+            while (!currentTokenIs(TokenType::SEMICOLON) && !currentTokenIs(TokenType::END_OF_FILE)) {
+                if (currentTokenIs(TokenType::IDENTIFIER)) {
+                    // CHANGE: Use parseColumnOrFunction() here so we can Group By Time Buckets!
+                    stmt->groupBy.push_back(parseColumnOrFunction());
+                } else {
+                    nextToken(); // Move past commas
                 }
-                nextToken();
             }
         }
     }

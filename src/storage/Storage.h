@@ -12,8 +12,16 @@ namespace quill {
 using Tuple = std::vector<std::string>;
 
 struct Chunk {
+    // Legacy support for your existing standard SQL engine
     std::vector<std::vector<std::string>> columns;
+    
+    // NEW: Fast-path numeric columns for the Time-Series engine
+    std::vector<std::vector<int64_t>> numeric_columns;
+    
     size_t size = 0;
+    
+    // Flag to tell executors which vectors to read
+    bool is_numeric = false; 
 };
 
 class Table {

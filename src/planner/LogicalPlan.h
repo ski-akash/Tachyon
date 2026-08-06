@@ -142,4 +142,20 @@ public:
     }
 };
 
+// NEW: Specialized Time-Series Scan Node
+class TickScanNode : public PlanNode {
+public:
+    std::string tableName;
+    uint64_t start_time;
+    uint64_t end_time;
+
+    TickScanNode(std::string table, uint64_t start, uint64_t end)
+        : tableName(std::move(table)), start_time(start), end_time(end) {}
+
+    std::string toString() const override {
+        return "TickScan(table: " + tableName + 
+               ", time_range: [" + std::to_string(start_time) + ", " + std::to_string(end_time) + "])";
+    }
+};
+
 } // namespace quill

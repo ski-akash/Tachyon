@@ -53,9 +53,11 @@ std::string Lexer::readNumber() {
 }
 
 TokenType Lexer::lookupIdentifier(const std::string& ident) {
+    // Convert to uppercase to make SQL case-insensitive
     std::string upper_ident = ident;
-    for (char& c : upper_ident) c = std::toupper(c);
-    
+    for (auto & c: upper_ident) c = toupper(c);
+
+    // Standard SQL Keywords
     if (upper_ident == "SELECT") return TokenType::SELECT;
     if (upper_ident == "FROM") return TokenType::FROM;
     if (upper_ident == "WHERE") return TokenType::WHERE;
@@ -63,10 +65,17 @@ TokenType Lexer::lookupIdentifier(const std::string& ident) {
     if (upper_ident == "ON") return TokenType::ON;
     if (upper_ident == "GROUP") return TokenType::GROUP;
     if (upper_ident == "BY") return TokenType::BY;
-    
-    // New Keyword :
     if (upper_ident == "EXPLAIN") return TokenType::EXPLAIN;
+
+    // Time-Series Keywords
+    if (upper_ident == "BETWEEN") return TokenType::BETWEEN;
+    if (upper_ident == "AND") return TokenType::AND;
     
+    // Time-Series Functions (Parsed as Identifiers first, the Parser handles the rest)
+    if (upper_ident == "TIME_BUCKET") return TokenType::IDENTIFIER;
+    if (upper_ident == "VWAP") return TokenType::IDENTIFIER;
+
+    // If it's not a recognized keyword, it's just a regular column/table name
     return TokenType::IDENTIFIER;
 }
 

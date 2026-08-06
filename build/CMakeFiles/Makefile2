@@ -64,11 +64,17 @@ CMAKE_BINARY_DIR = D:\quilldb\build
 # The main recursive "all" target.
 all: CMakeFiles/quilldb.dir/all
 all: CMakeFiles/quilldb_benchmark.dir/all
+all: CMakeFiles/quilldb_ts_benchmark.dir/all
+all: CMakeFiles/quilldb_flush_benchmark.dir/all
+all: CMakeFiles/quilldb_query_benchmark.dir/all
 .PHONY : all
 
 # The main recursive "codegen" target.
 codegen: CMakeFiles/quilldb.dir/codegen
 codegen: CMakeFiles/quilldb_benchmark.dir/codegen
+codegen: CMakeFiles/quilldb_ts_benchmark.dir/codegen
+codegen: CMakeFiles/quilldb_flush_benchmark.dir/codegen
+codegen: CMakeFiles/quilldb_query_benchmark.dir/codegen
 .PHONY : codegen
 
 # The main recursive "preinstall" target.
@@ -78,6 +84,9 @@ preinstall:
 # The main recursive "clean" target.
 clean: CMakeFiles/quilldb.dir/clean
 clean: CMakeFiles/quilldb_benchmark.dir/clean
+clean: CMakeFiles/quilldb_ts_benchmark.dir/clean
+clean: CMakeFiles/quilldb_flush_benchmark.dir/clean
+clean: CMakeFiles/quilldb_query_benchmark.dir/clean
 .PHONY : clean
 
 #=============================================================================
@@ -143,6 +152,102 @@ CMakeFiles/quilldb_benchmark.dir/codegen:
 CMakeFiles/quilldb_benchmark.dir/clean:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/clean
 .PHONY : CMakeFiles/quilldb_benchmark.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/quilldb_ts_benchmark.dir
+
+# All Build rule for target.
+CMakeFiles/quilldb_ts_benchmark.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=D:\quilldb\build\CMakeFiles --progress-num=33,34,35,36,37,38,39,40 "Built target quilldb_ts_benchmark"
+.PHONY : CMakeFiles/quilldb_ts_benchmark.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/quilldb_ts_benchmark.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start D:\quilldb\build\CMakeFiles 8
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/quilldb_ts_benchmark.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start D:\quilldb\build\CMakeFiles 0
+.PHONY : CMakeFiles/quilldb_ts_benchmark.dir/rule
+
+# Convenience name for target.
+quilldb_ts_benchmark: CMakeFiles/quilldb_ts_benchmark.dir/rule
+.PHONY : quilldb_ts_benchmark
+
+# codegen rule for target.
+CMakeFiles/quilldb_ts_benchmark.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=D:\quilldb\build\CMakeFiles --progress-num=33,34,35,36,37,38,39,40 "Finished codegen for target quilldb_ts_benchmark"
+.PHONY : CMakeFiles/quilldb_ts_benchmark.dir/codegen
+
+# clean rule for target.
+CMakeFiles/quilldb_ts_benchmark.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/clean
+.PHONY : CMakeFiles/quilldb_ts_benchmark.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/quilldb_flush_benchmark.dir
+
+# All Build rule for target.
+CMakeFiles/quilldb_flush_benchmark.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=D:\quilldb\build\CMakeFiles --progress-num=17,18,19,20,21,22,23,24 "Built target quilldb_flush_benchmark"
+.PHONY : CMakeFiles/quilldb_flush_benchmark.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/quilldb_flush_benchmark.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start D:\quilldb\build\CMakeFiles 8
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/quilldb_flush_benchmark.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start D:\quilldb\build\CMakeFiles 0
+.PHONY : CMakeFiles/quilldb_flush_benchmark.dir/rule
+
+# Convenience name for target.
+quilldb_flush_benchmark: CMakeFiles/quilldb_flush_benchmark.dir/rule
+.PHONY : quilldb_flush_benchmark
+
+# codegen rule for target.
+CMakeFiles/quilldb_flush_benchmark.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=D:\quilldb\build\CMakeFiles --progress-num=17,18,19,20,21,22,23,24 "Finished codegen for target quilldb_flush_benchmark"
+.PHONY : CMakeFiles/quilldb_flush_benchmark.dir/codegen
+
+# clean rule for target.
+CMakeFiles/quilldb_flush_benchmark.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/clean
+.PHONY : CMakeFiles/quilldb_flush_benchmark.dir/clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/quilldb_query_benchmark.dir
+
+# All Build rule for target.
+CMakeFiles/quilldb_query_benchmark.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=D:\quilldb\build\CMakeFiles --progress-num=25,26,27,28,29,30,31,32 "Built target quilldb_query_benchmark"
+.PHONY : CMakeFiles/quilldb_query_benchmark.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/quilldb_query_benchmark.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start D:\quilldb\build\CMakeFiles 8
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 CMakeFiles/quilldb_query_benchmark.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start D:\quilldb\build\CMakeFiles 0
+.PHONY : CMakeFiles/quilldb_query_benchmark.dir/rule
+
+# Convenience name for target.
+quilldb_query_benchmark: CMakeFiles/quilldb_query_benchmark.dir/rule
+.PHONY : quilldb_query_benchmark
+
+# codegen rule for target.
+CMakeFiles/quilldb_query_benchmark.dir/codegen:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/codegen
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=D:\quilldb\build\CMakeFiles --progress-num=25,26,27,28,29,30,31,32 "Finished codegen for target quilldb_query_benchmark"
+.PHONY : CMakeFiles/quilldb_query_benchmark.dir/codegen
+
+# clean rule for target.
+CMakeFiles/quilldb_query_benchmark.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/clean
+.PHONY : CMakeFiles/quilldb_query_benchmark.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

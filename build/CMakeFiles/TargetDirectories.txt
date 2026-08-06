@@ -1,4 +1,7 @@
 D:/quilldb/build/CMakeFiles/quilldb.dir
 D:/quilldb/build/CMakeFiles/quilldb_benchmark.dir
+D:/quilldb/build/CMakeFiles/quilldb_ts_benchmark.dir
+D:/quilldb/build/CMakeFiles/quilldb_flush_benchmark.dir
+D:/quilldb/build/CMakeFiles/quilldb_query_benchmark.dir
 D:/quilldb/build/CMakeFiles/edit_cache.dir
 D:/quilldb/build/CMakeFiles/rebuild_cache.dir

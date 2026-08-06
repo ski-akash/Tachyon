@@ -141,6 +141,45 @@ quilldb_benchmark/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/build
 .PHONY : quilldb_benchmark/fast
 
+#=============================================================================
+# Target rules for targets named quilldb_ts_benchmark
+
+# Build rule for target.
+quilldb_ts_benchmark: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 quilldb_ts_benchmark
+.PHONY : quilldb_ts_benchmark
+
+# fast build rule for target.
+quilldb_ts_benchmark/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/build
+.PHONY : quilldb_ts_benchmark/fast
+
+#=============================================================================
+# Target rules for targets named quilldb_flush_benchmark
+
+# Build rule for target.
+quilldb_flush_benchmark: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 quilldb_flush_benchmark
+.PHONY : quilldb_flush_benchmark
+
+# fast build rule for target.
+quilldb_flush_benchmark/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/build
+.PHONY : quilldb_flush_benchmark/fast
+
+#=============================================================================
+# Target rules for targets named quilldb_query_benchmark
+
+# Build rule for target.
+quilldb_query_benchmark: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 quilldb_query_benchmark
+.PHONY : quilldb_query_benchmark
+
+# fast build rule for target.
+quilldb_query_benchmark/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/build
+.PHONY : quilldb_query_benchmark/fast
+
 src/catalog/Catalog.obj: src/catalog/Catalog.cpp.obj
 .PHONY : src/catalog/Catalog.obj
 
@@ -148,6 +187,9 @@ src/catalog/Catalog.obj: src/catalog/Catalog.cpp.obj
 src/catalog/Catalog.cpp.obj:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/catalog/Catalog.cpp.obj
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/catalog/Catalog.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/catalog/Catalog.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/catalog/Catalog.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/catalog/Catalog.cpp.obj
 .PHONY : src/catalog/Catalog.cpp.obj
 
 src/catalog/Catalog.i: src/catalog/Catalog.cpp.i
@@ -157,6 +199,9 @@ src/catalog/Catalog.i: src/catalog/Catalog.cpp.i
 src/catalog/Catalog.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/catalog/Catalog.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/catalog/Catalog.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/catalog/Catalog.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/catalog/Catalog.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/catalog/Catalog.cpp.i
 .PHONY : src/catalog/Catalog.cpp.i
 
 src/catalog/Catalog.s: src/catalog/Catalog.cpp.s
@@ -166,6 +211,9 @@ src/catalog/Catalog.s: src/catalog/Catalog.cpp.s
 src/catalog/Catalog.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/catalog/Catalog.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/catalog/Catalog.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/catalog/Catalog.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/catalog/Catalog.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/catalog/Catalog.cpp.s
 .PHONY : src/catalog/Catalog.cpp.s
 
 src/cli/benchmark.obj: src/cli/benchmark.cpp.obj
@@ -192,6 +240,30 @@ src/cli/benchmark.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/cli/benchmark.cpp.s
 .PHONY : src/cli/benchmark.cpp.s
 
+src/cli/flush_benchmark.obj: src/cli/flush_benchmark.cpp.obj
+.PHONY : src/cli/flush_benchmark.obj
+
+# target to build an object file
+src/cli/flush_benchmark.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/cli/flush_benchmark.cpp.obj
+.PHONY : src/cli/flush_benchmark.cpp.obj
+
+src/cli/flush_benchmark.i: src/cli/flush_benchmark.cpp.i
+.PHONY : src/cli/flush_benchmark.i
+
+# target to preprocess a source file
+src/cli/flush_benchmark.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/cli/flush_benchmark.cpp.i
+.PHONY : src/cli/flush_benchmark.cpp.i
+
+src/cli/flush_benchmark.s: src/cli/flush_benchmark.cpp.s
+.PHONY : src/cli/flush_benchmark.s
+
+# target to generate assembly for a file
+src/cli/flush_benchmark.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/cli/flush_benchmark.cpp.s
+.PHONY : src/cli/flush_benchmark.cpp.s
+
 src/cli/main.obj: src/cli/main.cpp.obj
 .PHONY : src/cli/main.obj
 
@@ -216,6 +288,54 @@ src/cli/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/cli/main.cpp.s
 .PHONY : src/cli/main.cpp.s
 
+src/cli/query_benchmark.obj: src/cli/query_benchmark.cpp.obj
+.PHONY : src/cli/query_benchmark.obj
+
+# target to build an object file
+src/cli/query_benchmark.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/cli/query_benchmark.cpp.obj
+.PHONY : src/cli/query_benchmark.cpp.obj
+
+src/cli/query_benchmark.i: src/cli/query_benchmark.cpp.i
+.PHONY : src/cli/query_benchmark.i
+
+# target to preprocess a source file
+src/cli/query_benchmark.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/cli/query_benchmark.cpp.i
+.PHONY : src/cli/query_benchmark.cpp.i
+
+src/cli/query_benchmark.s: src/cli/query_benchmark.cpp.s
+.PHONY : src/cli/query_benchmark.s
+
+# target to generate assembly for a file
+src/cli/query_benchmark.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/cli/query_benchmark.cpp.s
+.PHONY : src/cli/query_benchmark.cpp.s
+
+src/cli/tick_benchmark.obj: src/cli/tick_benchmark.cpp.obj
+.PHONY : src/cli/tick_benchmark.obj
+
+# target to build an object file
+src/cli/tick_benchmark.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/cli/tick_benchmark.cpp.obj
+.PHONY : src/cli/tick_benchmark.cpp.obj
+
+src/cli/tick_benchmark.i: src/cli/tick_benchmark.cpp.i
+.PHONY : src/cli/tick_benchmark.i
+
+# target to preprocess a source file
+src/cli/tick_benchmark.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/cli/tick_benchmark.cpp.i
+.PHONY : src/cli/tick_benchmark.cpp.i
+
+src/cli/tick_benchmark.s: src/cli/tick_benchmark.cpp.s
+.PHONY : src/cli/tick_benchmark.s
+
+# target to generate assembly for a file
+src/cli/tick_benchmark.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/cli/tick_benchmark.cpp.s
+.PHONY : src/cli/tick_benchmark.cpp.s
+
 src/executor/Executor.obj: src/executor/Executor.cpp.obj
 .PHONY : src/executor/Executor.obj
 
@@ -223,6 +343,9 @@ src/executor/Executor.obj: src/executor/Executor.cpp.obj
 src/executor/Executor.cpp.obj:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/executor/Executor.cpp.obj
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/executor/Executor.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/executor/Executor.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/executor/Executor.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/executor/Executor.cpp.obj
 .PHONY : src/executor/Executor.cpp.obj
 
 src/executor/Executor.i: src/executor/Executor.cpp.i
@@ -232,6 +355,9 @@ src/executor/Executor.i: src/executor/Executor.cpp.i
 src/executor/Executor.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/executor/Executor.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/executor/Executor.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/executor/Executor.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/executor/Executor.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/executor/Executor.cpp.i
 .PHONY : src/executor/Executor.cpp.i
 
 src/executor/Executor.s: src/executor/Executor.cpp.s
@@ -241,6 +367,9 @@ src/executor/Executor.s: src/executor/Executor.cpp.s
 src/executor/Executor.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/executor/Executor.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/executor/Executor.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/executor/Executor.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/executor/Executor.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/executor/Executor.cpp.s
 .PHONY : src/executor/Executor.cpp.s
 
 src/lexer/Lexer.obj: src/lexer/Lexer.cpp.obj
@@ -250,6 +379,9 @@ src/lexer/Lexer.obj: src/lexer/Lexer.cpp.obj
 src/lexer/Lexer.cpp.obj:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/lexer/Lexer.cpp.obj
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/lexer/Lexer.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/lexer/Lexer.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/lexer/Lexer.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/lexer/Lexer.cpp.obj
 .PHONY : src/lexer/Lexer.cpp.obj
 
 src/lexer/Lexer.i: src/lexer/Lexer.cpp.i
@@ -259,6 +391,9 @@ src/lexer/Lexer.i: src/lexer/Lexer.cpp.i
 src/lexer/Lexer.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/lexer/Lexer.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/lexer/Lexer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/lexer/Lexer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/lexer/Lexer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/lexer/Lexer.cpp.i
 .PHONY : src/lexer/Lexer.cpp.i
 
 src/lexer/Lexer.s: src/lexer/Lexer.cpp.s
@@ -268,6 +403,9 @@ src/lexer/Lexer.s: src/lexer/Lexer.cpp.s
 src/lexer/Lexer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/lexer/Lexer.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/lexer/Lexer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/lexer/Lexer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/lexer/Lexer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/lexer/Lexer.cpp.s
 .PHONY : src/lexer/Lexer.cpp.s
 
 src/optimizer/Optimizer.obj: src/optimizer/Optimizer.cpp.obj
@@ -277,6 +415,9 @@ src/optimizer/Optimizer.obj: src/optimizer/Optimizer.cpp.obj
 src/optimizer/Optimizer.cpp.obj:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/optimizer/Optimizer.cpp.obj
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/optimizer/Optimizer.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/optimizer/Optimizer.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/optimizer/Optimizer.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/optimizer/Optimizer.cpp.obj
 .PHONY : src/optimizer/Optimizer.cpp.obj
 
 src/optimizer/Optimizer.i: src/optimizer/Optimizer.cpp.i
@@ -286,6 +427,9 @@ src/optimizer/Optimizer.i: src/optimizer/Optimizer.cpp.i
 src/optimizer/Optimizer.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/optimizer/Optimizer.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/optimizer/Optimizer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/optimizer/Optimizer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/optimizer/Optimizer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/optimizer/Optimizer.cpp.i
 .PHONY : src/optimizer/Optimizer.cpp.i
 
 src/optimizer/Optimizer.s: src/optimizer/Optimizer.cpp.s
@@ -295,6 +439,9 @@ src/optimizer/Optimizer.s: src/optimizer/Optimizer.cpp.s
 src/optimizer/Optimizer.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/optimizer/Optimizer.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/optimizer/Optimizer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/optimizer/Optimizer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/optimizer/Optimizer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/optimizer/Optimizer.cpp.s
 .PHONY : src/optimizer/Optimizer.cpp.s
 
 src/parser/Parser.obj: src/parser/Parser.cpp.obj
@@ -304,6 +451,9 @@ src/parser/Parser.obj: src/parser/Parser.cpp.obj
 src/parser/Parser.cpp.obj:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/parser/Parser.cpp.obj
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/parser/Parser.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/parser/Parser.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/parser/Parser.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/parser/Parser.cpp.obj
 .PHONY : src/parser/Parser.cpp.obj
 
 src/parser/Parser.i: src/parser/Parser.cpp.i
@@ -313,6 +463,9 @@ src/parser/Parser.i: src/parser/Parser.cpp.i
 src/parser/Parser.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/parser/Parser.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/parser/Parser.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/parser/Parser.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/parser/Parser.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/parser/Parser.cpp.i
 .PHONY : src/parser/Parser.cpp.i
 
 src/parser/Parser.s: src/parser/Parser.cpp.s
@@ -322,6 +475,9 @@ src/parser/Parser.s: src/parser/Parser.cpp.s
 src/parser/Parser.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/parser/Parser.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/parser/Parser.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/parser/Parser.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/parser/Parser.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/parser/Parser.cpp.s
 .PHONY : src/parser/Parser.cpp.s
 
 src/planner/Planner.obj: src/planner/Planner.cpp.obj
@@ -331,6 +487,9 @@ src/planner/Planner.obj: src/planner/Planner.cpp.obj
 src/planner/Planner.cpp.obj:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/planner/Planner.cpp.obj
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/planner/Planner.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/planner/Planner.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/planner/Planner.cpp.obj
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/planner/Planner.cpp.obj
 .PHONY : src/planner/Planner.cpp.obj
 
 src/planner/Planner.i: src/planner/Planner.cpp.i
@@ -340,6 +499,9 @@ src/planner/Planner.i: src/planner/Planner.cpp.i
 src/planner/Planner.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/planner/Planner.cpp.i
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/planner/Planner.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/planner/Planner.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/planner/Planner.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/planner/Planner.cpp.i
 .PHONY : src/planner/Planner.cpp.i
 
 src/planner/Planner.s: src/planner/Planner.cpp.s
@@ -349,6 +511,9 @@ src/planner/Planner.s: src/planner/Planner.cpp.s
 src/planner/Planner.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb.dir\build.make CMakeFiles/quilldb.dir/src/planner/Planner.cpp.s
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_benchmark.dir\build.make CMakeFiles/quilldb_benchmark.dir/src/planner/Planner.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_ts_benchmark.dir\build.make CMakeFiles/quilldb_ts_benchmark.dir/src/planner/Planner.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_flush_benchmark.dir\build.make CMakeFiles/quilldb_flush_benchmark.dir/src/planner/Planner.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\quilldb_query_benchmark.dir\build.make CMakeFiles/quilldb_query_benchmark.dir/src/planner/Planner.cpp.s
 .PHONY : src/planner/Planner.cpp.s
 
 # Help Target
@@ -361,15 +526,27 @@ help:
 	@echo ... rebuild_cache
 	@echo ... quilldb
 	@echo ... quilldb_benchmark
+	@echo ... quilldb_flush_benchmark
+	@echo ... quilldb_query_benchmark
+	@echo ... quilldb_ts_benchmark
 	@echo ... src/catalog/Catalog.obj
 	@echo ... src/catalog/Catalog.i
 	@echo ... src/catalog/Catalog.s
 	@echo ... src/cli/benchmark.obj
 	@echo ... src/cli/benchmark.i
 	@echo ... src/cli/benchmark.s
+	@echo ... src/cli/flush_benchmark.obj
+	@echo ... src/cli/flush_benchmark.i
+	@echo ... src/cli/flush_benchmark.s
 	@echo ... src/cli/main.obj
 	@echo ... src/cli/main.i
 	@echo ... src/cli/main.s
+	@echo ... src/cli/query_benchmark.obj
+	@echo ... src/cli/query_benchmark.i
+	@echo ... src/cli/query_benchmark.s
+	@echo ... src/cli/tick_benchmark.obj
+	@echo ... src/cli/tick_benchmark.i
+	@echo ... src/cli/tick_benchmark.s
 	@echo ... src/executor/Executor.obj
 	@echo ... src/executor/Executor.i
 	@echo ... src/executor/Executor.s

@@ -5,7 +5,8 @@ namespace quill {
 std::shared_ptr<PlanNode> Optimizer::optimize(std::shared_ptr<PlanNode> plan) {
     plan = applyPredicatePushdown(plan);
     plan = applyCostBasedJoinSelection(plan);
-    plan = applyIndexSelection(plan); // NEW
+    plan = applyIndexSelection(plan); 
+    plan = applyTimeSeriesPushdown(plan);
     return plan;
 }
 
@@ -145,6 +146,44 @@ std::shared_ptr<PlanNode> Optimizer::applyIndexSelection(std::shared_ptr<PlanNod
         }
     }
 
+    return plan;
+}
+
+std::shared_ptr<PlanNode> Optimizer::applyTimeSeriesPushdown(std::shared_ptr<PlanNode> plan) {
+    if (!plan) return nullptr;
+
+    // Recursive traversal (Join, Aggregate, Project...)
+    if (auto projectNode = std::dynamic_pointer_cast<ProjectNode>(plan)) {
+        projectNode->child = applyTimeSeriesPushdown(projectNode->child);
+    } else if (auto aggNode = std::dynamic_pointer_cast<AggregateNode>(plan)) {
+        aggNode->child = applyTimeSeriesPushdown(aggNode->child);
+    }
+    
+    // THE PUSHDOWN RULE
+    if (auto filterNode = std::dynamic_pointer_cast<FilterNode>(plan)) {
+        filterNode->child = applyTimeSeriesPushdown(filterNode->child);
+
+        // If filtering on a SeqScan of the "ticks" table...
+        if (auto scanNode = std::dynamic_pointer_cast<SeqScanNode>(filterNode->child)) {
+            if (scanNode->tableName == "ticks") {
+                
+                // Check if the predicate is our new BETWEEN expression
+                if (auto betweenExpr = std::dynamic_pointer_cast<BetweenExpression>(filterNode->predicate)) {
+                    
+                    // Note: Assuming your literal values parse as strings in the AST
+                    auto lowerNum = std::dynamic_pointer_cast<Identifier>(betweenExpr->lower); // Or NumberLiteral
+                    auto upperNum = std::dynamic_pointer_cast<Identifier>(betweenExpr->upper); // Or NumberLiteral
+                    
+                    if (lowerNum && upperNum) {
+                        // REWRITE: Drop the Filter, convert to TickScan!
+                        return std::make_shared<TickScanNode>(
+                            "ticks", std::stoull(lowerNum->value), std::stoull(upperNum->value)
+                        );
+                    }
+                }
+            }
+        }
+    }
     return plan;
 }
 
