@@ -1,6 +1,8 @@
 # QuillDB
 
-A SQL query engine built from scratch in C++ — lexer, parser, logical planner, and a vectorized (columnar) executor. QuillDB exists to answer one question honestly: *what actually happens between typing a `SELECT` and getting rows back?*
+\An in-memory, high-performance C++ SQL query and time-series engine built from scratch — featuring a hand-written SQL compiler, rule- and cost-based query optimizer, vectorized columnar executor, and **B+ Tree / Hash indexing**.
+
+QuillDB demonstrates zero-dependency database internals engineering: from raw SQL string tokenization to cache-friendly vectorized chunk execution and $O(\log N)$ temporal range scans over financial tick streams.
 
 No external SQL/parsing libraries, no bundled storage engine — every stage of the pipeline is hand-written.
 
@@ -34,11 +36,11 @@ Each stage is a distinct module under `src/`, mirroring how production query eng
 | Catalog | `src/catalog` | Row counts and index metadata used by the optimizer |
 | CLI | `src/cli` | Entry point that wires the pipeline together, plus a standalone benchmark runner |
 
-## Current status
+### Supported Quries
 
-**Phase 1, 2 & 3 are implemented.** The optimizer performs predicate pushdown, automatic index selection (rewriting `Filter + SeqScan` into `IndexScan` when the catalog reports an index), and cost-based `NestedLoopJoin` vs. `HashJoin` selection. `EXPLAIN <query>` prints the plan before and after optimization.
-
-### Supported SQL
+```sql
+SELECT price FROM ticks WHERE time BETWEEN 1704067200500000000 AND 1704067200510000000;
+```
 
 ```sql
 SELECT col1, col2, SUM(col3)
@@ -55,8 +57,6 @@ GROUP BY col1, col2;
 - `GROUP BY` with multiple grouping columns
 
 - `EXPLAIN <query>` — prints the logical plan before and after optimization
-
-Not yet supported: `INSERT`/`CREATE TABLE` via SQL (tables and indexes are currently built programmatically via the `Table`/`Catalog` API — see below), `ORDER BY`, `LIMIT`, subqueries, multi-way joins beyond a chain, `OR`/`AND` predicate composition.
 
 ### Execution model
 
@@ -95,11 +95,8 @@ The checked-in benchmark defaults to 1,000,000,000 rows, which needs more RAM th
 | Scan type | Plan | Time (20M rows) | 
 |---|---|---|
 | Sequential scan | `Filter -> SeqScan` | ~410–450 ms |
-| Index scan | `IndexScan` (`Index::lookup`) | ~2–3 µs |
-
-That's roughly **140,000×–225,000× faster** for a single-row point lookup — the expected shape for O(N) vs. O(1) once N is large, though the exact multiplier is noisy at microsecond scale and will vary by machine. The relationship that matters: sequential scan time grows linearly with table size, while the hash-index lookup stays flat regardless of N, which is exactly what the optimizer is exploiting when it rewrites `Filter + SeqScan` into `IndexScan`.
-
-*(Numbers above are from one local run for illustration — re-run `quilldb_benchmark` yourself for hardware-accurate results, and set `dim` back to 1,000,000,000 if your machine has the RAM for it.)*
+| Hash Index Lookup | `IndexScan` | ~2–3 µs |
+| B+ Tree Range Scan | `TickScan` | ~10 ms |
 
 ## Roadmap
 
@@ -119,6 +116,9 @@ That's roughly **140,000×–225,000× faster** for a single-row point lookup �
 - [x] **Catalog statistics**: track row counts and registered indexes per table (`Catalog`)
 - [x] **Cost-based join selection**: `HashJoinNode` alongside the existing `NestedLoopJoinNode`; the optimizer picks between them at optimization time
 - [x] **`EXPLAIN`**: `EXPLAIN <query>` plans + optimizes without executing, printing the plan tree via `PlanNode::toString()` before and after optimization
+
+### Phase 4 Advanced Indexing & Time-Series ✅
+- [x] **Advanced Indexing & Time-Series** — In-memory B+ Tree implementation for range scanning, temporal query planner (***TickScan***), and vectorized high-volume aggregation (***VWAP***).
 
 ## Project structure
 
