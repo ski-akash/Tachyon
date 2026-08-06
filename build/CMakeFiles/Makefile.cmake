@@ -64,4 +64,6 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/quilldb_ts_benchmark.dir/DependInfo.cmake"
   "CMakeFiles/quilldb_flush_benchmark.dir/DependInfo.cmake"
   "CMakeFiles/quilldb_query_benchmark.dir/DependInfo.cmake"
+  "CMakeFiles/quilldb_vwap_benchmark.dir/DependInfo.cmake"
+  "CMakeFiles/quilldb_btree_test.dir/DependInfo.cmake"
   )

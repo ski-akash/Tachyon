@@ -5,6 +5,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/quilldb_query_benchmark.dir/src/cli/query_benchmark.cpp.obj.d"
   "CMakeFiles/quilldb_query_benchmark.dir/src/executor/Executor.cpp.obj"
   "CMakeFiles/quilldb_query_benchmark.dir/src/executor/Executor.cpp.obj.d"
+  "CMakeFiles/quilldb_query_benchmark.dir/src/index/BTree.cpp.obj"
+  "CMakeFiles/quilldb_query_benchmark.dir/src/index/BTree.cpp.obj.d"
   "CMakeFiles/quilldb_query_benchmark.dir/src/lexer/Lexer.cpp.obj"
   "CMakeFiles/quilldb_query_benchmark.dir/src/lexer/Lexer.cpp.obj.d"
   "CMakeFiles/quilldb_query_benchmark.dir/src/optimizer/Optimizer.cpp.obj"

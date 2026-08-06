@@ -158,4 +158,22 @@ public:
     }
 };
 
+// NEW: Specialized Logical Node for B+Tree Range Scans
+class IndexRangeScanNode : public PlanNode {
+public:
+    std::string tableName;
+    std::string columnName;
+    int64_t start_val;
+    int64_t end_val;
+
+    IndexRangeScanNode(std::string table, std::string column, int64_t start, int64_t end)
+        : tableName(std::move(table)), columnName(std::move(column)), start_val(start), end_val(end) {}
+
+    std::string toString() const override {
+        return "IndexRangeScan(table: " + tableName + 
+               ", column: " + columnName + 
+               ", range: [" + std::to_string(start_val) + ", " + std::to_string(end_val) + "])";
+    }
+};
+
 } // namespace quill

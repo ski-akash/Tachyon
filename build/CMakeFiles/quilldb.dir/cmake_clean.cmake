@@ -5,6 +5,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/quilldb.dir/src/cli/main.cpp.obj.d"
   "CMakeFiles/quilldb.dir/src/executor/Executor.cpp.obj"
   "CMakeFiles/quilldb.dir/src/executor/Executor.cpp.obj.d"
+  "CMakeFiles/quilldb.dir/src/index/BTree.cpp.obj"
+  "CMakeFiles/quilldb.dir/src/index/BTree.cpp.obj.d"
   "CMakeFiles/quilldb.dir/src/lexer/Lexer.cpp.obj"
   "CMakeFiles/quilldb.dir/src/lexer/Lexer.cpp.obj.d"
   "CMakeFiles/quilldb.dir/src/optimizer/Optimizer.cpp.obj"

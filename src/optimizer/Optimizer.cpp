@@ -37,6 +37,35 @@ std::shared_ptr<PlanNode> Optimizer::applyPredicatePushdown(std::shared_ptr<Plan
         }
         
         return filterNode;
+
+        // NEW: B+Tree Index Range Scan Pushdown
+        if (auto scanNode = std::dynamic_pointer_cast<SeqScanNode>(filterNode->child)) {
+            // Check if the predicate is a BETWEEN expression
+            if (auto betweenExpr = std::dynamic_pointer_cast<BetweenExpression>(filterNode->predicate)) {
+                if (auto leftIdent = std::dynamic_pointer_cast<Identifier>(betweenExpr->left)) {
+                    
+                    std::string colName = leftIdent->value;
+
+                    // 1. Ask the Catalog if a B+Tree exists for this column!
+                    if (catalog_ && catalog_->hasIndex(scanNode->tableName, colName, quill::IndexType::BTREE)) {
+                        
+                        // 2. Extract the bounds
+                        auto lowerNum = std::dynamic_pointer_cast<Identifier>(betweenExpr->lower);
+                        auto upperNum = std::dynamic_pointer_cast<Identifier>(betweenExpr->upper);
+                        
+                        if (lowerNum && upperNum) {
+                            // 3. REWRITE THE AST: Drop the Filter and SeqScan, replace with IndexRangeScan!
+                            return std::make_shared<IndexRangeScanNode>(
+                                scanNode->tableName, 
+                                colName, 
+                                std::stoll(lowerNum->value), 
+                                std::stoll(upperNum->value)
+                            );
+                        }
+                    }
+                }
+            }
+        }
     }
     // 3. Traverse through Joins
     else if (auto joinNode = std::dynamic_pointer_cast<NestedLoopJoinNode>(plan)) {
@@ -134,7 +163,7 @@ std::shared_ptr<PlanNode> Optimizer::applyIndexSelection(std::shared_ptr<PlanNod
                         }
 
                         // THE MAGIC: Ask the catalog if this column has an index!
-                        if (catalog_->hasIndex(scanNode->tableName, colName)) {
+                        if (catalog_->hasIndex(scanNode->tableName, colName, quill::IndexType::HASH)) {
                             // YES! Rewrite the tree: Replace Filter+SeqScan with IndexScan
                             return std::make_shared<IndexScanNode>(
                                 scanNode->tableName, colName, rightLiteral->value

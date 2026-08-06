@@ -13,7 +13,7 @@ int main() {
     catalog->setTableRowCount("users", 1000000); // 1 Million rows
     
     // Register our index in the Catalog!
-    catalog->addIndex("users", "id"); 
+    catalog->createIndex("ticks", "price", quill::IndexType::BTREE);
 
     // 2. Front-End: Lex & Parse
     std::string sql = "EXPLAIN SELECT name FROM users WHERE id = 42;"; 

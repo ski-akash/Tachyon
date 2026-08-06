@@ -71,7 +71,7 @@ int main() {
     
     // Create the index and register it with the Catalog
     users_table->createIndex("id");
-    catalog->addIndex("users", "id");
+    catalog->createIndex("users", "id", quill::IndexType::HASH); // or BTREE
 
     quill::Optimizer smartOptimizer(catalog);
     auto smartPlan = smartOptimizer.optimize(logicalPlan); // Optimizer automatically chooses IndexScan
