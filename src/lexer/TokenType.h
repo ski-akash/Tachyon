@@ -22,6 +22,11 @@ enum class TokenType {
     STAR,       // *
     SLASH,      // /
     EQUALS,     // =
+    NOT_EQUALS, // != or <>
+    LESS_THAN,      // <
+    GREATER_THAN,   // >
+    LESS_EQUAL,     // <=
+    GREATER_EQUAL,  // >=
     JOIN,
     ON,
     GROUP,

@@ -18,6 +18,11 @@ void Lexer::advance() {
     read_position_++;
 }
 
+char Lexer::peekChar() const {
+    if (read_position_ >= source_.length()) return '\0';
+    return source_[read_position_];
+}
+
 void Lexer::skipWhitespace() {
     while (current_char_ == ' ' || current_char_ == '\t' || 
            current_char_ == '\n' || current_char_ == '\r') {
@@ -86,6 +91,33 @@ Token Lexer::nextToken() {
     switch (current_char_) {
         case '=':
             token = {TokenType::EQUALS, "="};
+            break;
+        case '<':
+            if (peekChar() == '=') {
+                advance();
+                token = {TokenType::LESS_EQUAL, "<="};
+            } else if (peekChar() == '>') {
+                advance();
+                token = {TokenType::NOT_EQUALS, "<>"};
+            } else {
+                token = {TokenType::LESS_THAN, "<"};
+            }
+            break;
+        case '>':
+            if (peekChar() == '=') {
+                advance();
+                token = {TokenType::GREATER_EQUAL, ">="};
+            } else {
+                token = {TokenType::GREATER_THAN, ">"};
+            }
+            break;
+        case '!':
+            if (peekChar() == '=') {
+                advance();
+                token = {TokenType::NOT_EQUALS, "!="};
+            } else {
+                token = {TokenType::ILLEGAL, "!"};
+            }
             break;
         case ';':
             token = {TokenType::SEMICOLON, ";"};

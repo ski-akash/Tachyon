@@ -1,4 +1,5 @@
 #include "parser/Parser.h"
+#include <unordered_map>
 
 namespace quill {
 
@@ -88,8 +89,25 @@ std::shared_ptr<Expression> Parser::parseExpression() {
         return std::make_shared<BetweenExpression>(left, lower, upper);
     }
 
-    // ... existing operator parsing (e.g., =, <, >) ...
-    // If you have logic for 'id = 42', it goes here.
+    // Comparison operators: id = 42, age > 18, price <= 100, ...
+    static const std::unordered_map<TokenType, std::string> kComparisonOps = {
+        {TokenType::EQUALS, "="},
+        {TokenType::NOT_EQUALS, "!="},
+        {TokenType::LESS_THAN, "<"},
+        {TokenType::GREATER_THAN, ">"},
+        {TokenType::LESS_EQUAL, "<="},
+        {TokenType::GREATER_EQUAL, ">="},
+    };
+
+    auto it = kComparisonOps.find(current_token_.type);
+    if (it != kComparisonOps.end()) {
+        std::string op = it->second;
+        nextToken(); // Consume the operator
+
+        auto right = parseColumnOrFunction();
+        return std::make_shared<BinaryExpression>(left, op, right);
+    }
+
     return left;
 }
 
@@ -115,7 +133,13 @@ std::shared_ptr<JoinClause> Parser::parseJoinClause() {
 // NEW: Parse a regular column or a multi-argument function call
 std::shared_ptr<Expression> Parser::parseColumnOrFunction() {
     std::string name = current_token_.literal;
+    bool is_number = currentTokenIs(TokenType::NUMBER);
     nextToken(); // Advance past the name
+
+    // A numeric literal is never followed by '(' or column semantics
+    if (is_number) {
+        return std::make_shared<NumberLiteral>(name);
+    }
 
     // If the next token is a '(', this is a function call!
     if (currentTokenIs(TokenType::LPAREN)) {

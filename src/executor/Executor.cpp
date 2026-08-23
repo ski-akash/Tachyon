@@ -1,7 +1,36 @@
 #include "executor/Executor.h"
 #include <algorithm>
+#include <charconv>
 
 namespace quill {
+
+namespace {
+
+// Evaluates "lhs <op> rhs" for a column value. Numeric comparison is used
+// whenever both sides parse as numbers (covers <, >, <=, >=, =, !=); string
+// comparison is the fallback for = and != on non-numeric columns.
+bool evaluateComparison(const std::string& lhs, const std::string& op, const std::string& rhs) {
+    double lhs_num, rhs_num;
+    auto lhs_result = std::from_chars(lhs.data(), lhs.data() + lhs.size(), lhs_num);
+    auto rhs_result = std::from_chars(rhs.data(), rhs.data() + rhs.size(), rhs_num);
+    bool both_numeric = lhs_result.ec == std::errc() && rhs_result.ec == std::errc();
+
+    if (both_numeric) {
+        if (op == "=") return lhs_num == rhs_num;
+        if (op == "!=") return lhs_num != rhs_num;
+        if (op == "<") return lhs_num < rhs_num;
+        if (op == ">") return lhs_num > rhs_num;
+        if (op == "<=") return lhs_num <= rhs_num;
+        if (op == ">=") return lhs_num >= rhs_num;
+        return false;
+    }
+
+    if (op == "=") return lhs == rhs;
+    if (op == "!=") return lhs != rhs;
+    return false; // <, >, <=, >= are meaningless on non-numeric values
+}
+
+} // namespace
 
 // ---------------------------------------------------------
 // 1. SEQUENCE SCAN (Vectorized)
@@ -56,7 +85,7 @@ bool FilterExecutor::next(Chunk& out_chunk) {
         }
 
         auto binary_expr = std::dynamic_pointer_cast<BinaryExpression>(predicate_);
-        if (binary_expr && binary_expr->op == "=") {
+        if (binary_expr) {
             auto left_ident = std::dynamic_pointer_cast<Identifier>(binary_expr->left);
             auto right_literal = std::dynamic_pointer_cast<NumberLiteral>(binary_expr->right);
 
@@ -69,7 +98,7 @@ bool FilterExecutor::next(Chunk& out_chunk) {
 
                     // Tight CPU loop to evaluate the filter over the whole batch
                     for (size_t row_idx = 0; row_idx < in_chunk.size; ++row_idx) {
-                        if (in_chunk.columns[col_idx][row_idx] == right_literal->value) {
+                        if (evaluateComparison(in_chunk.columns[col_idx][row_idx], binary_expr->op, right_literal->value)) {
                             // Row passes, copy it to the output chunk
                             for (size_t c = 0; c < in_chunk.columns.size(); ++c) {
                                 out_chunk.columns[c].push_back(in_chunk.columns[c][row_idx]);

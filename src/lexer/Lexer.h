@@ -24,6 +24,7 @@ private:
 
     // Helper methods
     void advance();
+    char peekChar() const;
     void skipWhitespace();
     
     // Multi-character helpers
