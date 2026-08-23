@@ -28,37 +28,35 @@ std::shared_ptr<PlanNode> Optimizer::applyPredicatePushdown(std::shared_ptr<Plan
         // If this Filter is sitting on top of a Project, swap them!
         // (Filter -> Project -> Scan) becomes (Project -> Filter -> Scan)
         if (auto childProject = std::dynamic_pointer_cast<ProjectNode>(filterNode->child)) {
-            
+
             // Rewire the tree
             filterNode->child = childProject->child; // Filter now points to Scan
             childProject->child = filterNode;        // Project now points to Filter
-            
+
             return childProject; // The Project is now the new top of this sub-tree
         }
-        
-        return filterNode;
 
-        // NEW: B+Tree Index Range Scan Pushdown
+        // B+Tree Index Range Scan Pushdown
         if (auto scanNode = std::dynamic_pointer_cast<SeqScanNode>(filterNode->child)) {
             // Check if the predicate is a BETWEEN expression
             if (auto betweenExpr = std::dynamic_pointer_cast<BetweenExpression>(filterNode->predicate)) {
                 if (auto leftIdent = std::dynamic_pointer_cast<Identifier>(betweenExpr->left)) {
-                    
+
                     std::string colName = leftIdent->value;
 
                     // 1. Ask the Catalog if a B+Tree exists for this column!
                     if (catalog_ && catalog_->hasIndex(scanNode->tableName, colName, quill::IndexType::BTREE)) {
-                        
-                        // 2. Extract the bounds
-                        auto lowerNum = std::dynamic_pointer_cast<Identifier>(betweenExpr->lower);
-                        auto upperNum = std::dynamic_pointer_cast<Identifier>(betweenExpr->upper);
-                        
+
+                        // 2. Extract the bounds (numeric literals parse as NumberLiteral)
+                        auto lowerNum = std::dynamic_pointer_cast<NumberLiteral>(betweenExpr->lower);
+                        auto upperNum = std::dynamic_pointer_cast<NumberLiteral>(betweenExpr->upper);
+
                         if (lowerNum && upperNum) {
                             // 3. REWRITE THE AST: Drop the Filter and SeqScan, replace with IndexRangeScan!
                             return std::make_shared<IndexRangeScanNode>(
-                                scanNode->tableName, 
-                                colName, 
-                                std::stoll(lowerNum->value), 
+                                scanNode->tableName,
+                                colName,
+                                std::stoll(lowerNum->value),
                                 std::stoll(upperNum->value)
                             );
                         }
@@ -66,6 +64,8 @@ std::shared_ptr<PlanNode> Optimizer::applyPredicatePushdown(std::shared_ptr<Plan
                 }
             }
         }
+
+        return filterNode;
     }
     // 3. Traverse through Joins
     else if (auto joinNode = std::dynamic_pointer_cast<NestedLoopJoinNode>(plan)) {
@@ -198,10 +198,9 @@ std::shared_ptr<PlanNode> Optimizer::applyTimeSeriesPushdown(std::shared_ptr<Pla
                 
                 // Check if the predicate is our new BETWEEN expression
                 if (auto betweenExpr = std::dynamic_pointer_cast<BetweenExpression>(filterNode->predicate)) {
-                    
-                    // Note: Assuming your literal values parse as strings in the AST
-                    auto lowerNum = std::dynamic_pointer_cast<Identifier>(betweenExpr->lower); // Or NumberLiteral
-                    auto upperNum = std::dynamic_pointer_cast<Identifier>(betweenExpr->upper); // Or NumberLiteral
+
+                    auto lowerNum = std::dynamic_pointer_cast<NumberLiteral>(betweenExpr->lower);
+                    auto upperNum = std::dynamic_pointer_cast<NumberLiteral>(betweenExpr->upper);
                     
                     if (lowerNum && upperNum) {
                         // REWRITE: Drop the Filter, convert to TickScan!

@@ -11,9 +11,10 @@ int main() {
     // 1. Initialize Catalog with Statistics and Indexes
     auto catalog = std::make_shared<quill::Catalog>();
     catalog->setTableRowCount("users", 1000000); // 1 Million rows
-    
-    // Register our index in the Catalog!
-    catalog->createIndex("ticks", "price", quill::IndexType::BTREE);
+
+    // Register a hash index on the column the demo query actually filters on,
+    // so the optimizer's automatic index selection rule has something to find.
+    catalog->createIndex("users", "id", quill::IndexType::HASH);
 
     // 2. Front-End: Lex & Parse
     std::string sql = "EXPLAIN SELECT name FROM users WHERE id = 42;"; 
