@@ -10,6 +10,7 @@ set(CORE_SOURCES
     src/parser/Parser.cpp
     src/planner/Planner.cpp
     src/executor/Executor.cpp
+    src/executor/PlanCompiler.cpp
     src/optimizer/Optimizer.cpp
     src/catalog/Catalog.cpp
     src/index/BTree.cpp
