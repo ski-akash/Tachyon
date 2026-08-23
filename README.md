@@ -2,27 +2,34 @@
 
 An in-memory, high-performance C++ SQL query and time-series engine built from scratch — featuring a hand-written SQL compiler, rule- and cost-based query optimizer, vectorized columnar executor, and **B+ Tree / Hash indexing**.
 
-QuillDB demonstrates zero-dependency database internals engineering: from raw SQL string tokenization to cache-friendly vectorized chunk execution and $O(\log N)$ temporal range scans over financial tick streams.
+Tachyon demonstrates zero-dependency database internals engineering: from raw SQL string tokenization to cache-friendly vectorized chunk execution and $O(\log N)$ temporal range scans over financial tick streams.
 
 No external SQL/parsing libraries, no bundled storage engine — every stage of the pipeline is hand-written.
 
 ## Architecture
 
+Tachyon is really two engines sharing a lexer/parser front end: a general-purpose SQL pipeline over in-memory columnar tables, and a separate time-series pipeline over a memory-mapped tick file.
+
 ```mermaid
 flowchart LR
-    SQL["SQL text"] --> Lexer
-    Lexer --> Parser
-    Parser --> AST["AST\n(Statements / Expressions)"]
-    AST --> Planner
-    Planner --> LP["Logical plan\n(Scan, Filter, Join, Aggregate, Project)"]
+    SQL["SQL text"] --> Lexer --> Parser --> AST["AST"]
+    AST --> Planner --> LP["Logical plan"]
     LP --> Optimizer["Optimizer\n(rule-based + cost-based)"]
-    Optimizer --> PP["Physical plan"]
-    PP --> Executor["Vectorized executor"]
-    Executor --> Storage["Columnar storage\n(in-memory tables)"]
-    Catalog["Catalog\n(row counts, distinct counts)"] -.-> Optimizer
-```
+    Optimizer --> OP["Optimized plan"]
+    OP --> Compiler["PlanCompiler"]
+    Compiler --> Executor["Vectorized executor\n(Volcano model)"]
+    Executor --> Table["Table\n(in-memory columnar)"]
+    Table -.-> HashIdx["Hash Index\n(O(1) equality)"]
+    Table -.-> BTreeIdx["B+ Tree\n(O(log N) range)"]
+    Catalog["Catalog\n(row counts, indexes)"] -.-> Optimizer
 
-Each stage is a distinct module under `src/`, mirroring how production query engines (Postgres, DuckDB) separate concerns:
+    Ticks["Tick ingestion"] --> Ring["SPSC Ring Buffer"]
+    Ring --> TickStore["TickStore\n(columnar, in-memory)"]
+    TickStore --> Flusher["TickFlusher\n(delta-encoded)"]
+    Flusher --> File["ticks_data.bin"]
+    File --> MMap["MMapReader"]
+    MMap --> TickScan["TickScanExecutor / VWAP"]
+```
 
 | Stage | Directory | Responsibility |
 |---|---|---|
@@ -30,13 +37,19 @@ Each stage is a distinct module under `src/`, mirroring how production query eng
 | Parser | `src/parser` | Recursive-descent parser → builds the AST |
 | AST | `src/ast` | Statement/Expression node definitions (`SelectStatement`, `BinaryExpression`, `FunctionCall`, ...) |
 | Planner | `src/planner` | Converts the AST into a tree of relational algebra operators (the logical plan) |
-| Executor | `src/executor` | Walks the plan and executes it using the Volcano/iterator model over columnar `Chunk`s |
-| Storage | `src/storage` | In-memory columnar `Table` / `Index` representation |
-| Optimizer | `src/optimizer` | Rule-based + cost-based rewrites of the logical plan |
+| Optimizer | `src/optimizer` | Rule-based + cost-based rewrites of the logical plan (index selection, join selection, BETWEEN pushdown) |
 | Catalog | `src/catalog` | Row counts and index metadata used by the optimizer |
-| CLI | `src/cli` | Entry point that wires the pipeline together, plus a standalone benchmark runner |
+| PlanCompiler | `src/executor/PlanCompiler.*` | Translates an optimized plan into a runnable executor tree, resolving table names against a table registry |
+| Executor | `src/executor` | Walks the plan and executes it using the Volcano/iterator model over columnar `Chunk`s |
+| Storage | `src/storage` | In-memory columnar `Table`, hash `Index`, and the separate tick/time-series storage (`TickStore`, `TickFlusher`, `MMapReader`, ring buffer) |
+| Index | `src/index` | The B+Tree implementation backing range-scan indexes |
+| CLI | `src/cli` | Entry point plus the standalone benchmark runners |
 
-### Supported Quries
+### Supported queries
+
+```sql
+SELECT name FROM users WHERE id = 42;
+```
 
 ```sql
 SELECT price FROM ticks WHERE time BETWEEN 1704067200500000000 AND 1704067200510000000;
@@ -52,21 +65,22 @@ GROUP BY col1, col2;
 
 - `SELECT` with column projection and aggregate functions (`SUM`, `COUNT`, ...)
 - `FROM` with a single base table
-- `JOIN ... ON <predicate>` (executed as a nested-loop join)
-- `WHERE` with comparison operators (`=`, `>`, `<`, ...)
+- `JOIN ... ON <predicate>` (nested-loop or hash join, chosen by the cost-based optimizer)
+- `WHERE` with comparison operators (`=`, `!=`, `<`, `>`, `<=`, `>=`) and `BETWEEN ... AND ...`
 - `GROUP BY` with multiple grouping columns
-
-- `EXPLAIN <query>` — prints the logical plan before and after optimization
+- `EXPLAIN <query>` — prints the logical plan before and after optimization, then runs it
 
 ### Execution model
 
 Data is stored **columnar** (`Table::column_data_`, one vector per column) and executed **vectorized** — operators pull `Chunk`s (batches of rows, column-major) from their children rather than one row at a time, following the Volcano/iterator (`init()` / `next()`) execution model used by most real query engines.
 
+`EXPLAIN` isn't a dead end: `PlanCompiler` turns whatever the optimizer decided into an actual `Executor` tree, so the same run that prints the before/after plan also prints real result rows — there's no separate "toy" path that only prints plans and a "real" path that only benchmarks hand-wired executors.
+
 ## Build & run
 
 Requires CMake 3.14+ and a C++17 compiler.
 
-```powershell
+```bash
 # From the project root
 mkdir build
 cd build
@@ -74,66 +88,80 @@ cmake ..
 cmake --build .
 
 # Run
-.\quilldb.exe          # Windows
 ./quilldb               # Linux / macOS
+.\quilldb.exe            # Windows
 ```
 
-> The current `main.cpp` runs a fixed demo query (`EXPLAIN SELECT name FROM users WHERE id = 42;`) against a hardcoded in-memory table and prints the plan before and after optimization, so the index-selection rewrite is observable end-to-end without a REPL.
+`main.cpp` runs a fixed demo query (`EXPLAIN SELECT name FROM users WHERE id = 42;`) against a 100-row in-memory table: it prints the plan before optimization, the plan after the optimizer rewrites `Filter + SeqScan` into `IndexScan`, and then the actual matching row.
 
 ## Benchmarks
 
-`src/cli/benchmark.cpp` builds a second executable, `quilldb_benchmark`, that isolates the payoff of the optimizer's automatic index selection: it runs `SELECT name FROM users WHERE id = <val>;` twice against the same table — once forcing a `Filter -> SeqScan` (what the naive Phase 1/2 planner would have produced) and once via the optimizer-selected `IndexScan` (a single `unordered_map` lookup in `Index`, see `src/storage/Index.h`) — and times both with `std::chrono::high_resolution_clock`.
+All numbers below were captured on this machine (Apple M5, macOS, `clang++ -O2`, C++17) by building and running the checked-in benchmark targets directly — nothing here is estimated.
 
-```
-cmake --build . --target quilldb_benchmark
-./quilldb_benchmark        # Linux / macOS
-.\quilldb_benchmark.exe    # Windows
-```
+**Hash index vs. sequential scan** — `quilldb_benchmark` runs `SELECT name FROM users WHERE id = <val>;` against a 1,000,000-row table, once as a forced `Filter -> SeqScan` and once via the optimizer-selected `IndexScan` (`src/storage/Index.h`, a single `unordered_map` lookup):
 
-The checked-in benchmark defaults to 1,000,000,000 rows, which needs more RAM than a typical dev machine has free just for two `std::string` columns held in memory. The results below were captured by building the same code with the row count turned down to 20,000,000 (`sed -i 's/1000000000/20000000/'`) on a single-core Linux sandbox (g++ -O2):
+| Plan | Time (1M rows) |
+|---|---|
+| `Filter -> SeqScan` | ~54–56 ms |
+| `IndexScan` | <1 ms |
 
-| Scan type | Plan | Time (20M rows) | 
-|---|---|---|
-| Sequential scan | `Filter -> SeqScan` | ~410–450 ms |
-| Hash Index Lookup | `IndexScan` | ~2–3 µs |
-| B+ Tree Range Scan | `TickScan` | ~10 ms |
+**B+ Tree range scan vs. linear scan** — `quilldb_btree_test` builds a B+Tree over 5,000,000 sequential keys and runs `BETWEEN` against both the tree (`BTree::searchRange`, an $O(\log N)$ descent + horizontal leaf traversal) and a linear pass over the same data:
 
-## Roadmap
+| Scan | Time (5M keys, 51-row range) |
+|---|---|
+| Linear scan | ~4.95 ms |
+| B+Tree range scan | ~11 µs (~450x faster) |
 
-### Phase 1 — Front end ✅
-- [x] Lexer: SQL text → tokens
-- [x] Recursive-descent parser: tokens → AST
-- [x] Logical planner: AST → relational algebra tree (`SeqScan`, `Filter`, `Project`)
+**Tick ingestion** — `quilldb_ts_benchmark` pushes 10,485,760 ticks through the SPSC ring buffer into `TickStore`:
 
-### Phase 2 — Execution ✅
-- [x] Columnar storage (`Table`, `Chunk`)
-- [x] Vectorized (Volcano-model) executor
-- [x] `JOIN ... ON` via nested-loop join
-- [x] `GROUP BY` + aggregate functions (`AggregateNode`)
+| Metric | Value |
+|---|---|
+| Throughput | ~12.2M ticks/sec |
+| p50 latency | ~43 µs |
+| p99 latency | ~90 µs |
 
-### Phase 3 — Optimizer ✅
-- [x] **Rule-based optimization**: predicate pushdown, plus automatic index selection (rewrites `Filter + SeqScan` into `IndexScan` when the catalog reports a matching index)
-- [x] **Catalog statistics**: track row counts and registered indexes per table (`Catalog`)
-- [x] **Cost-based join selection**: `HashJoinNode` alongside the existing `NestedLoopJoinNode`; the optimizer picks between them at optimization time
-- [x] **`EXPLAIN`**: `EXPLAIN <query>` plans + optimizes without executing, printing the plan tree via `PlanNode::toString()` before and after optimization
+**Persistence** — `quilldb_flush_benchmark` delta-encodes and flushes 10,000,000 ticks to `ticks_data.bin` (`TickFlusher`):
 
-### Phase 4 Advanced Indexing & Time-Series ✅
-- [x] **Advanced Indexing & Time-Series** — In-memory B+ Tree implementation for range scanning, temporal query planner (***TickScan***), and vectorized high-volume aggregation (***VWAP***).
+| Metric | Value |
+|---|---|
+| Flush time | ~351 ms |
+| Write bandwidth | ~516 MB/sec |
+| Raw size (32 bytes/tick) | ~305 MB |
+| Delta-encoded size | ~181 MB (~41% smaller) |
+
+**Time-series query + VWAP** — `quilldb_query_benchmark` runs a `BETWEEN` query through `TickScanExecutor` against the flushed 10M-tick file (a memory-mapped, delta-decoded forward scan — not the B+Tree above, since this path reads from `ticks_data.bin` rather than a `Table`); `quilldb_vwap_benchmark` aggregates VWAP/OHLCV buckets over a 30-minute window:
+
+| Query | Time |
+|---|---|
+| `TickScan` (479 matching rows out of 10M) | ~3 ms |
+| VWAP/OHLCV aggregation (~10M ticks, 3 buckets) | ~438 ms |
+
+To reproduce: `cmake --build . --target <name>` for any of `quilldb_benchmark`, `quilldb_btree_test`, `quilldb_ts_benchmark`, `quilldb_flush_benchmark`, `quilldb_query_benchmark`, `quilldb_vwap_benchmark` (the last two need `quilldb_flush_benchmark` to have generated `ticks_data.bin` in the working directory first).
 
 ## Project structure
 
 ```
-quilldb/
+tachyon/
 ├── CMakeLists.txt
 ├── src/
-│   ├── lexer/       # Lexer.h / Lexer.cpp / TokenType.h
-│   ├── parser/       # Parser.h / Parser.cpp
-│   ├── ast/          # AST.h — Statement & Expression node definitions
-│   ├── planner/       # Planner.h / Planner.cpp, LogicalPlan.h — operator tree
-│   ├── optimizer/     # Optimizer.h / Optimizer.cpp — predicate pushdown, index selection, cost-based join choice
-│   ├── catalog/       # Catalog.h / Catalog.cpp — row counts + index metadata
-│   ├── executor/      # Executor.h / Executor.cpp — Volcano-model execution
-│   ├── storage/       # Storage.h, Index.h — columnar Table / Chunk / hash Index
-│   └── cli/          # main.cpp — entry point; benchmark.cpp — perf benchmark runner
-└── build/            # CMake build output (generated)
+│   ├── lexer/          # Lexer.h / Lexer.cpp / TokenType.h
+│   ├── parser/          # Parser.h / Parser.cpp
+│   ├── ast/             # AST.h — Statement & Expression node definitions
+│   ├── planner/          # Planner.h / Planner.cpp, LogicalPlan.h — operator tree
+│   ├── optimizer/        # Optimizer.h / Optimizer.cpp — predicate pushdown, index selection, cost-based join choice
+│   ├── catalog/          # Catalog.h / Catalog.cpp — row counts + index metadata
+│   ├── index/            # BTree.h / BTree.cpp — B+Tree used by range-indexed columns
+│   ├── executor/
+│   │   ├── Executor.h/.cpp          # Scan/Filter/Project/Join/Aggregate/IndexScan executors
+│   │   ├── PlanCompiler.h/.cpp      # Optimized plan -> runnable executor tree
+│   │   ├── IndexRangeScanExecutor.h # B+Tree-backed range scan over a Table
+│   │   └── TickScanExecutor.h       # Memory-mapped scan over a flushed tick file
+│   ├── storage/
+│   │   ├── Storage.h, Index.h       # Columnar Table / Chunk / hash Index
+│   │   └── Tick.h, TickStore.h, TickFlusher.h, MMapReader.h, RingBuffer.h
+│   │                                 # Separate time-series storage: ingestion ring
+│   │                                 # buffer, columnar tick store, delta-encoded
+│   │                                 # persistence, and mmap-based reads
+│   └── cli/             # main.cpp + standalone benchmark runners
+└── build/                # CMake build output (generated, not tracked)
 ```
