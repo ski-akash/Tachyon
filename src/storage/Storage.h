@@ -1,6 +1,7 @@
 #pragma once
 
 #include "storage/Index.h" // NEW
+#include "index/BTree.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -34,6 +35,9 @@ public:
     // NEW: A map of column names to their Indexes
     std::unordered_map<std::string, std::shared_ptr<Index>> indexes_;
 
+    // A map of column names to their B+Tree range indexes (numeric columns only)
+    std::unordered_map<std::string, std::shared_ptr<BTree>> range_indexes_;
+
     Table(std::string n, std::vector<std::string> cols)
         : name(std::move(n)), column_names(std::move(cols)) {
         column_data_.resize(column_names.size());
@@ -54,6 +58,21 @@ public:
         }
     }
 
+    // NEW: Allow users to create a B+Tree range index on a numeric column
+    void createRangeIndex(const std::string& colName) {
+        if (range_indexes_.find(colName) == range_indexes_.end()) {
+            auto tree = std::make_shared<BTree>();
+            range_indexes_[colName] = tree;
+
+            int colIdx = getColumnIndex(colName);
+            if (colIdx != -1) {
+                for (size_t r = 0; r < num_rows_; ++r) {
+                    tree->insert(std::stoll(column_data_[colIdx][r]), r);
+                }
+            }
+        }
+    }
+
     void insert(const Tuple& row) {
         if (row.size() != column_names.size()) {
             throw std::runtime_error("Insert failed: Row size does not match column count.");
@@ -68,6 +87,11 @@ public:
             auto it = indexes_.find(column_names[i]);
             if (it != indexes_.end()) {
                 it->second->insert(row[i], new_row_id);
+            }
+
+            auto rit = range_indexes_.find(column_names[i]);
+            if (rit != range_indexes_.end()) {
+                rit->second->insert(std::stoll(row[i]), new_row_id);
             }
         }
         num_rows_++;

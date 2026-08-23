@@ -1,4 +1,5 @@
 #include "executor/PlanCompiler.h"
+#include "executor/IndexRangeScanExecutor.h"
 #include <stdexcept>
 
 namespace quill {
@@ -84,10 +85,18 @@ PlanCompiler::Compiled PlanCompiler::compileNode(const std::shared_ptr<PlanNode>
                 mergedSchema};
     }
 
-    if (std::dynamic_pointer_cast<TickScanNode>(plan) || std::dynamic_pointer_cast<IndexRangeScanNode>(plan)) {
+    if (auto rangeScanNode = std::dynamic_pointer_cast<IndexRangeScanNode>(plan)) {
+        auto table = lookupTable(rangeScanNode->tableName);
+        return {std::make_unique<IndexRangeScanExecutor>(table, rangeScanNode->columnName,
+                                                          rangeScanNode->start_val, rangeScanNode->end_val),
+                table};
+    }
+
+    if (std::dynamic_pointer_cast<TickScanNode>(plan)) {
         throw std::runtime_error(
-            "PlanCompiler: " + plan->toString().substr(0, plan->toString().find('(')) +
-            " has no physical executor wired up yet");
+            "PlanCompiler: TickScan has no physical executor wired up yet "
+            "(see TickScanExecutor.h, which reads from a memory-mapped tick file "
+            "rather than a Table and isn't part of this table-based pipeline)");
     }
 
     throw std::runtime_error("PlanCompiler: unrecognized plan node");
