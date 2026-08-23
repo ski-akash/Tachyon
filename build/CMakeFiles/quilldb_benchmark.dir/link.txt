@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\quilldb_benchmark.dir/objects.a
-C:\MinGW\bin\ar.exe qc CMakeFiles\quilldb_benchmark.dir/objects.a @CMakeFiles\quilldb_benchmark.dir\objects1.rsp
-C:\MinGW\bin\c++.exe -Wl,--whole-archive CMakeFiles\quilldb_benchmark.dir/objects.a -Wl,--no-whole-archive -o quilldb_benchmark.exe -Wl,--out-implib,libquilldb_benchmark.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\quilldb_benchmark.dir\linkLibs.rsp

@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\quilldb.dir/objects.a
-C:\MinGW\bin\ar.exe qc CMakeFiles\quilldb.dir/objects.a @CMakeFiles\quilldb.dir\objects1.rsp
-C:\MinGW\bin\c++.exe -Wl,--whole-archive CMakeFiles\quilldb.dir/objects.a -Wl,--no-whole-archive -o quilldb.exe -Wl,--out-implib,libquilldb.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\quilldb.dir\linkLibs.rsp
