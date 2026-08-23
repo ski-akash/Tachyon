@@ -2,13 +2,18 @@
 
 #include <string>
 
-namespace quill {
+namespace tachyon {
 
 enum class TokenType {
     // Keywords
     SELECT,
     FROM,
     WHERE,
+    CREATE,
+    TABLE,
+    INSERT,
+    INTO,
+    VALUES,
 
     // Identifiers and Literals
     IDENTIFIER, // e.g., table names, column names
@@ -54,4 +59,4 @@ struct Token {
     std::string literal;
 };
 
-} // namespace quill
+} // namespace tachyon

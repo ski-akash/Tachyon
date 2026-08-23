@@ -13,7 +13,7 @@
 #include <unistd.h>
 #endif
 
-namespace quill {
+namespace tachyon {
 
 class MMapReader {
 public:
@@ -61,4 +61,4 @@ public:
     }
 };
 
-} // namespace quill
+} // namespace tachyon

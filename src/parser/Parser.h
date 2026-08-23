@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-namespace quill {
+namespace tachyon {
 
 class Parser {
 public:
@@ -26,6 +26,8 @@ private:
     // Parsing functions for specific parts of the SQL grammar
     std::shared_ptr<Statement> parseStatement();
     std::shared_ptr<SelectStatement> parseSelectStatement();
+    std::shared_ptr<Statement> parseCreateTableStatement();
+    std::shared_ptr<Statement> parseInsertStatement();
 
     // NEW: Parses things like "id = 42"
     std::shared_ptr<Expression> parseExpression();
@@ -44,4 +46,4 @@ private:
     bool expectPeek(TokenType type);
 };
 
-} // namespace quill
+} // namespace tachyon

@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <mutex>
 
-namespace quill {
+namespace tachyon {
 
 class TickStore {
 public:
@@ -47,4 +47,4 @@ public:
     size_t size() const { return timestamps.size(); }
 };
 
-} // namespace quill
+} // namespace tachyon

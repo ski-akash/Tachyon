@@ -5,7 +5,7 @@
 #include <memory>
 #include <stdexcept>
 
-namespace quill {
+namespace tachyon {
 
 class Planner {
 public:
@@ -17,4 +17,4 @@ private:
     std::shared_ptr<PlanNode> planSelect(const std::shared_ptr<SelectStatement>& stmt);
 };
 
-} // namespace quill
+} // namespace tachyon

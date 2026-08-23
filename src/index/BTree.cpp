@@ -1,7 +1,7 @@
 #include "index/BTree.h"
 #include <algorithm>
 
-namespace quill {
+namespace tachyon {
 
 // A helper struct to pass split data back up the recursive call stack
 struct SplitResult {
@@ -143,4 +143,4 @@ std::vector<uint64_t> BTree::searchRange(int64_t start_key, int64_t end_key) {
     return results;
 }
 
-} // namespace quill
+} // namespace tachyon

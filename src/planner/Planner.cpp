@@ -1,6 +1,6 @@
 #include "planner/Planner.h"
 
-namespace quill {
+namespace tachyon {
 
 std::shared_ptr<PlanNode> Planner::createPlan(const std::shared_ptr<Statement>& stmt) {
     // We use dynamic_cast to figure out what type of Statement the parser gave us
@@ -51,4 +51,4 @@ std::shared_ptr<PlanNode> Planner::planSelect(const std::shared_ptr<SelectStatem
     return root; 
 }
 
-} // namespace quill
+} // namespace tachyon

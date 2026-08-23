@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace quill {
+namespace tachyon {
 
 class Index {
 public:
@@ -31,4 +31,4 @@ public:
     }
 };
 
-} // namespace quill
+} // namespace tachyon

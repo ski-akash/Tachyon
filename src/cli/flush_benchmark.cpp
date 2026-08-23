@@ -4,13 +4,13 @@
 #include <chrono>
 #include <fstream>
 
-using namespace quill;
+using namespace tachyon;
 
 constexpr size_t TOTAL_TICKS = 10000000; // 10 Million ticks
 
 int main() {
     std::cout << "==========================================\n";
-    std::cout << " QuillDB Persistence & Compression Test   \n";
+    std::cout << " Tachyon Persistence & Compression Test   \n";
     std::cout << "==========================================\n\n";
 
     TickStore store;

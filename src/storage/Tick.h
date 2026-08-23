@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-namespace quill {
+namespace tachyon {
 
 // 32-byte aligned for perfect L1 cache line packing (2 ticks per 64-byte line)
 struct alignas(32) Tick {
@@ -15,4 +15,4 @@ struct alignas(32) Tick {
     uint8_t  padding[5];    // 5 bytes: Explicit padding
 };
 
-} // namespace quill
+} // namespace tachyon

@@ -7,7 +7,7 @@
 #include <vector>
 #include <cstring>
 
-namespace quill {
+namespace tachyon {
 
 class TickScanExecutor : public Executor {
 private:
@@ -101,4 +101,4 @@ public:
     }
 };
 
-} // namespace quill
+} // namespace tachyon

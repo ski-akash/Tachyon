@@ -6,7 +6,7 @@
 #include <cstddef>
 #include <stdexcept>
 
-namespace quill {
+namespace tachyon {
 
 template <size_t Capacity>
 class SPSCRingBuffer {
@@ -55,4 +55,4 @@ private:
     alignas(64) std::atomic<size_t> tail_{0};
 };
 
-} // namespace quill
+} // namespace tachyon

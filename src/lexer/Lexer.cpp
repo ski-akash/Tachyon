@@ -1,7 +1,7 @@
 #include "Lexer.h"
 #include <cctype>
 
-namespace quill {
+namespace tachyon {
 
 Lexer::Lexer(std::string source) : source_(std::move(source)) {
     // Read the very first character so we are ready to go
@@ -49,6 +49,17 @@ std::string Lexer::readIdentifier() {
     return source_.substr(start_pos, position_ - start_pos);
 }
 
+std::string Lexer::readString() {
+    advance(); // Consume the opening quote
+    size_t start_pos = position_;
+    while (current_char_ != '\'' && current_char_ != '\0') {
+        advance();
+    }
+    std::string result = source_.substr(start_pos, position_ - start_pos);
+    advance(); // Consume the closing quote
+    return result;
+}
+
 std::string Lexer::readNumber() {
     size_t start_pos = position_;
     while (isDigit(current_char_)) {
@@ -71,6 +82,11 @@ TokenType Lexer::lookupIdentifier(const std::string& ident) {
     if (upper_ident == "GROUP") return TokenType::GROUP;
     if (upper_ident == "BY") return TokenType::BY;
     if (upper_ident == "EXPLAIN") return TokenType::EXPLAIN;
+    if (upper_ident == "CREATE") return TokenType::CREATE;
+    if (upper_ident == "TABLE") return TokenType::TABLE;
+    if (upper_ident == "INSERT") return TokenType::INSERT;
+    if (upper_ident == "INTO") return TokenType::INTO;
+    if (upper_ident == "VALUES") return TokenType::VALUES;
 
     // Time-Series Keywords
     if (upper_ident == "BETWEEN") return TokenType::BETWEEN;
@@ -134,6 +150,10 @@ Token Lexer::nextToken() {
         case '*':
             token = {TokenType::STAR, "*"};
             break;
+        case '\'':
+            token.literal = readString();
+            token.type = TokenType::STRING_LITERAL;
+            return token; // Return early because readString() already calls advance() past the closing quote
         case '\0':
             token = {TokenType::END_OF_FILE, ""};
             break;
@@ -169,4 +189,4 @@ std::vector<Token> Lexer::tokenize() {
     return tokens;
 }
 
-} // namespace quill
+} // namespace tachyon

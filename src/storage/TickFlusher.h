@@ -7,7 +7,7 @@
 #include <cstdint>
 #include <stdexcept>
 
-namespace quill {
+namespace tachyon {
 
 class TickFlusher {
 public:
@@ -21,7 +21,7 @@ public:
         size_t row_count = store.size();
         
         // 1. Write File Header (Magic Bytes + Row Count)
-        const char magic[] = "QDBT"; // QuillDB TimeSeries
+        const char magic[] = "QDBT"; // Tachyon TimeSeries
         out.write(magic, 4);
         out.write(reinterpret_cast<const char*>(&row_count), sizeof(size_t));
 
@@ -54,4 +54,4 @@ public:
     }
 };
 
-} // namespace quill
+} // namespace tachyon

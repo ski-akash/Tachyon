@@ -6,7 +6,7 @@
 #include <memory>
 #include <iostream>
 
-namespace quill {
+namespace tachyon {
 
 // The state we maintain for every single time bucket
 struct VWAPState {
@@ -99,4 +99,4 @@ public:
     }
 };
 
-} // namespace quill
+} // namespace tachyon

@@ -1,6 +1,6 @@
 #include "optimizer/Optimizer.h"
 
-namespace quill {
+namespace tachyon {
 
 std::shared_ptr<PlanNode> Optimizer::optimize(std::shared_ptr<PlanNode> plan) {
     plan = applyPredicatePushdown(plan);
@@ -45,7 +45,7 @@ std::shared_ptr<PlanNode> Optimizer::applyPredicatePushdown(std::shared_ptr<Plan
                     std::string colName = leftIdent->value;
 
                     // 1. Ask the Catalog if a B+Tree exists for this column!
-                    if (catalog_ && catalog_->hasIndex(scanNode->tableName, colName, quill::IndexType::BTREE)) {
+                    if (catalog_ && catalog_->hasIndex(scanNode->tableName, colName, tachyon::IndexType::BTREE)) {
 
                         // 2. Extract the bounds (numeric literals parse as NumberLiteral)
                         auto lowerNum = std::dynamic_pointer_cast<NumberLiteral>(betweenExpr->lower);
@@ -154,19 +154,30 @@ std::shared_ptr<PlanNode> Optimizer::applyIndexSelection(std::shared_ptr<PlanNod
             if (auto binaryExpr = std::dynamic_pointer_cast<BinaryExpression>(filterNode->predicate)) {
                 if (binaryExpr->op == "=") {
                     auto leftIdent = std::dynamic_pointer_cast<Identifier>(binaryExpr->left);
-                    auto rightLiteral = std::dynamic_pointer_cast<NumberLiteral>(binaryExpr->right);
 
-                    if (leftIdent && rightLiteral) {
+                    // The right-hand side of an equality can be a number
+                    // (id = 42) or a quoted string (department = 'Sales')
+                    std::string rightValue;
+                    bool hasLiteral = false;
+                    if (auto numLit = std::dynamic_pointer_cast<NumberLiteral>(binaryExpr->right)) {
+                        rightValue = numLit->value;
+                        hasLiteral = true;
+                    } else if (auto strLit = std::dynamic_pointer_cast<StringLiteral>(binaryExpr->right)) {
+                        rightValue = strLit->value;
+                        hasLiteral = true;
+                    }
+
+                    if (leftIdent && hasLiteral) {
                         std::string colName = leftIdent->value;
                         if (colName.find('.') != std::string::npos) {
                             colName = colName.substr(colName.find('.') + 1); // Strip "users." prefix
                         }
 
                         // THE MAGIC: Ask the catalog if this column has an index!
-                        if (catalog_->hasIndex(scanNode->tableName, colName, quill::IndexType::HASH)) {
+                        if (catalog_->hasIndex(scanNode->tableName, colName, tachyon::IndexType::HASH)) {
                             // YES! Rewrite the tree: Replace Filter+SeqScan with IndexScan
                             return std::make_shared<IndexScanNode>(
-                                scanNode->tableName, colName, rightLiteral->value
+                                scanNode->tableName, colName, rightValue
                             );
                         }
                     }
@@ -215,4 +226,4 @@ std::shared_ptr<PlanNode> Optimizer::applyTimeSeriesPushdown(std::shared_ptr<Pla
     return plan;
 }
 
-} // namespace quill
+} // namespace tachyon

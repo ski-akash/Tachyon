@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tachyon</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff;
+    --fg: #111111;
+    --muted: #666666;
+    --border: #dddddd;
+    --accent: #111111;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111111;
+      --fg: #eeeeee;
+      --muted: #999999;
+      --border: #333333;
+      --accent: #eeeeee;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 14px;
+  }
+  main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  p.sub {
+    color: var(--muted);
+    margin: 0 0 32px;
+    font-size: 13px;
+  }
+  #status { color: var(--muted); font-size: 13px; margin-bottom: 16px; }
+  form { display: flex; gap: 8px; margin-bottom: 8px; }
+  textarea {
+    flex: 1;
+    background: transparent;
+    color: var(--fg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font: inherit;
+    resize: vertical;
+    min-height: 40px;
+    overflow-y: hidden;
+  }
+  button {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 4px;
+    padding: 0 18px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.4; cursor: default; }
+  .hint { color: var(--muted); font-size: 12px; margin: 0 0 32px; }
+  .hint code {
+    background: var(--border);
+    padding: 1px 5px;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  section { margin-top: 28px; }
+  h2 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 600;
+    margin: 0 0 10px;
+  }
+  table { border-collapse: collapse; width: 100%; }
+  th, td {
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+  }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  .msg { color: var(--muted); white-space: pre-wrap; }
+  .msg.error { color: #c0392b; }
+  ul.tables { list-style: none; margin: 0; padding: 0; }
+  ul.tables li { padding: 6px 0; border-bottom: 1px solid var(--border); }
+  ul.tables li:last-child { border-bottom: none; }
+  ul.tables .name { font-weight: 600; }
+  ul.tables .meta { color: var(--muted); font-size: 12px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Tachyon</h1>
+  <p class="sub">Time-series SQL engine, compiled to WebAssembly, running entirely in this tab.</p>
+
+  <div id="status">Loading engine…</div>
+
+  <form id="query-form">
+    <textarea id="sql" placeholder="SELECT name FROM employees WHERE department = 'Engineering';" disabled></textarea>
+    <button id="run" type="submit" disabled>Run</button>
+  </form>
+  <p class="hint">Try <code data-fill="SELECT * FROM employees;">SELECT * FROM employees;</code> or <code data-fill=".tables">.tables</code></p>
+  <p class="hint">Tick data (20,000 synthetic AAPL ticks): <code data-fill="SELECT price, size FROM ticks WHERE time BETWEEN 1704067200000000000 AND 1704067201000000000;">BETWEEN range scan</code> or <code data-fill="SELECT TIME_BUCKET(time, '1m'), VWAP(price, size), SUM(size), COUNT(*) FROM ticks WHERE time BETWEEN 1704067200000000000 AND 1704068400000000000 GROUP BY TIME_BUCKET(time, '1m');">VWAP by 1-minute bucket</code></p>
+
+  <section>
+    <h2>Result</h2>
+    <div id="result"><span class="msg">No query run yet.</span></div>
+  </section>
+
+  <section>
+    <h2>Tables</h2>
+    <ul class="tables" id="tables"></ul>
+  </section>
+</main>
+
+<script src="tachyon.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

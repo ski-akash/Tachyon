@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-namespace quill {
+namespace tachyon {
 
 // ---------------------------------------------------------
 // BASE INTERFACES
@@ -53,6 +53,14 @@ public:
     std::string value;
     explicit NumberLiteral(std::string val) : value(std::move(val)) {}
     std::string toString() const override { return value; }
+};
+
+// Represents a quoted string literal (e.g., 'Engineering')
+class StringLiteral : public Expression {
+public:
+    std::string value;
+    explicit StringLiteral(std::string val) : value(std::move(val)) {}
+    std::string toString() const override { return "'" + value + "'"; }
 };
 
 // NEW: Represents operations like 'id = 42' or 'age > 18'
@@ -156,6 +164,50 @@ public:
             result += " ]";
         }
         
+        return result;
+    }
+};
+
+// Represents a CREATE TABLE statement: CREATE TABLE users (id, name);
+class CreateTableStatement : public Statement {
+public:
+    std::string tableName;
+    std::vector<std::string> columns;
+
+    CreateTableStatement(std::string table, std::vector<std::string> cols)
+        : tableName(std::move(table)), columns(std::move(cols)) {}
+
+    std::string toString() const override {
+        std::string result = "CREATE TABLE " + tableName + " (";
+        for (size_t i = 0; i < columns.size(); ++i) {
+            result += columns[i];
+            if (i < columns.size() - 1) result += ", ";
+        }
+        result += ")";
+        return result;
+    }
+};
+
+// Represents an INSERT statement: INSERT INTO users VALUES (1, 'Alice'), (2, 'Bob');
+class InsertStatement : public Statement {
+public:
+    std::string tableName;
+    std::vector<std::vector<std::string>> rows; // One vector of literal values per row
+
+    InsertStatement(std::string table, std::vector<std::vector<std::string>> r)
+        : tableName(std::move(table)), rows(std::move(r)) {}
+
+    std::string toString() const override {
+        std::string result = "INSERT INTO " + tableName + " VALUES ";
+        for (size_t r = 0; r < rows.size(); ++r) {
+            result += "(";
+            for (size_t i = 0; i < rows[r].size(); ++i) {
+                result += rows[r][i];
+                if (i < rows[r].size() - 1) result += ", ";
+            }
+            result += ")";
+            if (r < rows.size() - 1) result += ", ";
+        }
         return result;
     }
 };

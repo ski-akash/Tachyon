@@ -5,7 +5,7 @@
 #include <cstdint>
 #include <iostream>
 
-namespace quill {
+namespace tachyon {
 
 // The maximum number of keys a node can hold before it must split.
 constexpr size_t BTREE_ORDER = 128; 
@@ -65,4 +65,4 @@ public:
     std::vector<uint64_t> searchRange(int64_t start_key, int64_t end_key);
 };
 
-} // namespace quill
+} // namespace tachyon

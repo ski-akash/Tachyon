@@ -6,7 +6,7 @@
 #include <vector>
 #include <algorithm>
 
-using namespace quill;
+using namespace tachyon;
 
 constexpr size_t BUFFER_SIZE = 1048576; // 1M capacity
 constexpr size_t BATCHES = 10;          // 10 batches of 1M = 10M total ticks
@@ -17,7 +17,7 @@ TickStore tick_store;
 
 int main() {
     std::cout << "==========================================\n";
-    std::cout << "   QuillDB Time-Series Ingestion Benchmark\n";
+    std::cout << "   Tachyon Time-Series Ingestion Benchmark\n";
     std::cout << "==========================================\n\n";
 
     tick_store.getOrInternSymbol("AAPL");

@@ -3,10 +3,10 @@
 #include <iostream>
 #include <chrono>
 
-using namespace quill;
+using namespace tachyon;
 
 int main() {
-    std::cout << "=== QuillDB Quant: VWAP & OHLCV Aggregation ===\n\n";
+    std::cout << "=== Tachyon Quant: VWAP & OHLCV Aggregation ===\n\n";
 
     // Simulating: SELECT TIME_BUCKET(time, '1m'), VWAP(price, size), SUM(size), COUNT(*)
     //             FROM ticks 

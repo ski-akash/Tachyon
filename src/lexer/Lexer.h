@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace quill {
+namespace tachyon {
 
 class Lexer {
 public:
@@ -32,7 +32,8 @@ private:
     bool isDigit(char ch);
     std::string readIdentifier();
     std::string readNumber();
+    std::string readString();
     TokenType lookupIdentifier(const std::string& ident);
 }; 
 
-} // namespace quill 
+} // namespace tachyon 

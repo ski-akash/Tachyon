@@ -1,7 +1,7 @@
 #include "parser/Parser.h"
 #include <unordered_map>
 
-namespace quill {
+namespace tachyon {
 
 Parser::Parser(Lexer lexer) : lexer_(std::move(lexer)) {
     // Read two tokens immediately so both current_token_ and peek_token_ are populated
@@ -52,7 +52,102 @@ std::shared_ptr<Statement> Parser::parseStatement() {
     if (current_token_.type == TokenType::SELECT) {
         return parseSelectStatement();
     }
+    if (current_token_.type == TokenType::CREATE) {
+        return parseCreateTableStatement();
+    }
+    if (current_token_.type == TokenType::INSERT) {
+        return parseInsertStatement();
+    }
     return nullptr;
+}
+
+// Parses CREATE TABLE <name> (<col1>, <col2>, ...);
+std::shared_ptr<Statement> Parser::parseCreateTableStatement() {
+    nextToken(); // Consume 'CREATE'
+
+    if (!currentTokenIs(TokenType::TABLE)) {
+        throw std::runtime_error("Parser Error: Expected TABLE after CREATE.");
+    }
+    nextToken(); // Consume 'TABLE'
+
+    if (!currentTokenIs(TokenType::IDENTIFIER)) {
+        throw std::runtime_error("Parser Error: Expected a table name after CREATE TABLE.");
+    }
+    std::string tableName = current_token_.literal;
+    nextToken();
+
+    if (!currentTokenIs(TokenType::LPAREN)) {
+        throw std::runtime_error("Parser Error: Expected '(' after the table name.");
+    }
+    nextToken(); // Consume '('
+
+    std::vector<std::string> columns;
+    while (!currentTokenIs(TokenType::RPAREN) && !currentTokenIs(TokenType::END_OF_FILE)) {
+        if (currentTokenIs(TokenType::IDENTIFIER)) {
+            columns.push_back(current_token_.literal);
+            nextToken();
+        }
+        if (currentTokenIs(TokenType::COMMA)) {
+            nextToken();
+        }
+    }
+
+    if (currentTokenIs(TokenType::RPAREN)) {
+        nextToken(); // Consume ')'
+    }
+
+    return std::make_shared<CreateTableStatement>(tableName, columns);
+}
+
+// Parses INSERT INTO <name> VALUES (<v1>, <v2>, ...), (<v1>, <v2>, ...);
+std::shared_ptr<Statement> Parser::parseInsertStatement() {
+    nextToken(); // Consume 'INSERT'
+
+    if (!currentTokenIs(TokenType::INTO)) {
+        throw std::runtime_error("Parser Error: Expected INTO after INSERT.");
+    }
+    nextToken(); // Consume 'INTO'
+
+    if (!currentTokenIs(TokenType::IDENTIFIER)) {
+        throw std::runtime_error("Parser Error: Expected a table name after INSERT INTO.");
+    }
+    std::string tableName = current_token_.literal;
+    nextToken();
+
+    if (!currentTokenIs(TokenType::VALUES)) {
+        throw std::runtime_error("Parser Error: Expected VALUES after the table name.");
+    }
+    nextToken(); // Consume 'VALUES'
+
+    std::vector<std::vector<std::string>> rows;
+
+    while (currentTokenIs(TokenType::LPAREN)) {
+        nextToken(); // Consume '('
+
+        std::vector<std::string> row;
+        while (!currentTokenIs(TokenType::RPAREN) && !currentTokenIs(TokenType::END_OF_FILE)) {
+            if (currentTokenIs(TokenType::NUMBER) || currentTokenIs(TokenType::STRING_LITERAL)) {
+                row.push_back(current_token_.literal);
+                nextToken();
+            }
+            if (currentTokenIs(TokenType::COMMA)) {
+                nextToken();
+            }
+        }
+
+        if (currentTokenIs(TokenType::RPAREN)) {
+            nextToken(); // Consume ')'
+        }
+        rows.push_back(std::move(row));
+
+        if (currentTokenIs(TokenType::COMMA)) {
+            nextToken(); // Consume ',' between row tuples, loop for the next '('
+        } else {
+            break;
+        }
+    }
+
+    return std::make_shared<InsertStatement>(tableName, rows);
 }
 
 // NEW: Parses EXPLAIN followed by a SELECT
@@ -134,11 +229,15 @@ std::shared_ptr<JoinClause> Parser::parseJoinClause() {
 std::shared_ptr<Expression> Parser::parseColumnOrFunction() {
     std::string name = current_token_.literal;
     bool is_number = currentTokenIs(TokenType::NUMBER);
+    bool is_string = currentTokenIs(TokenType::STRING_LITERAL);
     nextToken(); // Advance past the name
 
-    // A numeric literal is never followed by '(' or column semantics
+    // Literals are never followed by '(' or column semantics
     if (is_number) {
         return std::make_shared<NumberLiteral>(name);
+    }
+    if (is_string) {
+        return std::make_shared<StringLiteral>(name);
     }
 
     // If the next token is a '(', this is a function call!
@@ -193,6 +292,11 @@ std::shared_ptr<SelectStatement> Parser::parseSelectStatement() {
         if (current_token_.type == TokenType::IDENTIFIER) {
             // NEW: Use our smart helper method
             stmt->columns.push_back(parseColumnOrFunction());
+        } else if (current_token_.type == TokenType::STAR) {
+            // SELECT * - expanded to the table's actual columns once the
+            // table name is known, in Database::executeSelect.
+            stmt->columns.push_back(std::make_shared<Identifier>("*"));
+            nextToken();
         } else {
             nextToken(); // Move past commas
         }
@@ -206,10 +310,12 @@ std::shared_ptr<SelectStatement> Parser::parseSelectStatement() {
     }
     nextToken(); // Advance past the table name
 
-    // Check for JOIN clauses
+    // Check for JOIN clauses. parseJoinClause() parses the ON condition via
+    // parseExpression(), which already leaves current_token_ positioned on
+    // whatever follows (another JOIN, WHERE, GROUP, or ';') - no extra
+    // nextToken() here, or the token right after the ON clause gets skipped.
     while (currentTokenIs(TokenType::JOIN)) {
         stmt->joins.push_back(parseJoinClause());
-        nextToken(); 
     }
 
     // Check if there is a WHERE clause
@@ -243,4 +349,4 @@ std::shared_ptr<SelectStatement> Parser::parseSelectStatement() {
     return stmt;
 }
 
-} // namespace quill
+} // namespace tachyon

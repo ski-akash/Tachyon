@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace quill {
+namespace tachyon {
 
 // Base class for all relational algebra operators
 class PlanNode {
@@ -176,4 +176,4 @@ public:
     }
 };
 
-} // namespace quill
+} // namespace tachyon

@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
-namespace quill {
+namespace tachyon {
 
 using Tuple = std::vector<std::string>;
 
@@ -105,4 +105,4 @@ public:
     }
 };
 
-} // namespace quill
+} // namespace tachyon

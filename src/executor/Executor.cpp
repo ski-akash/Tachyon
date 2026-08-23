@@ -1,10 +1,19 @@
 #include "executor/Executor.h"
 #include <algorithm>
 #include <charconv>
+#include <optional>
 
-namespace quill {
+namespace tachyon {
 
 namespace {
+
+// A predicate's right-hand side is a literal - either a bare number
+// (WHERE id = 42) or a quoted string (WHERE department = 'Engineering').
+std::optional<std::string> literalValue(const std::shared_ptr<Expression>& expr) {
+    if (auto num = std::dynamic_pointer_cast<NumberLiteral>(expr)) return num->value;
+    if (auto str = std::dynamic_pointer_cast<StringLiteral>(expr)) return str->value;
+    return std::nullopt;
+}
 
 // Evaluates "lhs <op> rhs" for a column value. Numeric comparison is used
 // whenever both sides parse as numbers (covers <, >, <=, >=, =, !=); string
@@ -87,7 +96,7 @@ bool FilterExecutor::next(Chunk& out_chunk) {
         auto binary_expr = std::dynamic_pointer_cast<BinaryExpression>(predicate_);
         if (binary_expr) {
             auto left_ident = std::dynamic_pointer_cast<Identifier>(binary_expr->left);
-            auto right_literal = std::dynamic_pointer_cast<NumberLiteral>(binary_expr->right);
+            auto right_literal = literalValue(binary_expr->right);
 
             if (left_ident && right_literal) {
                 int col_idx = table_schema_->getColumnIndex(left_ident->value);
@@ -98,7 +107,7 @@ bool FilterExecutor::next(Chunk& out_chunk) {
 
                     // Tight CPU loop to evaluate the filter over the whole batch
                     for (size_t row_idx = 0; row_idx < in_chunk.size; ++row_idx) {
-                        if (evaluateComparison(in_chunk.columns[col_idx][row_idx], binary_expr->op, right_literal->value)) {
+                        if (evaluateComparison(in_chunk.columns[col_idx][row_idx], binary_expr->op, *right_literal)) {
                             // Row passes, copy it to the output chunk
                             for (size_t c = 0; c < in_chunk.columns.size(); ++c) {
                                 out_chunk.columns[c].push_back(in_chunk.columns[c][row_idx]);
@@ -128,12 +137,38 @@ void ProjectExecutor::init() {
 
 bool ProjectExecutor::next(Chunk& out_chunk) {
     Chunk in_chunk;
-    
+
     if (child_->next(in_chunk)) {
+        out_chunk.size = in_chunk.size;
+
+        // Time-series / aggregate pipelines hand back numeric-only chunks
+        // (see Chunk::is_numeric). Mirror the same projection logic over
+        // numeric_columns instead of the legacy string columns.
+        if (in_chunk.is_numeric) {
+            out_chunk.is_numeric = true;
+            out_chunk.numeric_columns.assign(columns_.size(), std::vector<int64_t>());
+
+            for (size_t out_c = 0; out_c < columns_.size(); ++out_c) {
+                auto ident = std::dynamic_pointer_cast<Identifier>(columns_[out_c]);
+                if (ident) {
+                    int in_c = table_schema_->getColumnIndex(ident->value);
+                    if (in_c != -1 && static_cast<size_t>(in_c) < in_chunk.numeric_columns.size()) {
+                        out_chunk.numeric_columns[out_c] = in_chunk.numeric_columns[in_c];
+                    }
+                } else if (out_c < in_chunk.numeric_columns.size()) {
+                    // Not a plain column reference (e.g. TIME_BUCKET(...),
+                    // VWAP(...), SUM(...)) - the child (an aggregate) has
+                    // already computed exactly these values positionally,
+                    // in the order the SELECT list named them.
+                    out_chunk.numeric_columns[out_c] = in_chunk.numeric_columns[out_c];
+                }
+            }
+            return true;
+        }
+
         out_chunk.columns.resize(columns_.size());
         for (auto& col : out_chunk.columns) col.clear();
-        out_chunk.size = in_chunk.size;
-        
+
         // Build a new chunk containing ONLY the requested columns
         for (size_t out_c = 0; out_c < columns_.size(); ++out_c) {
             auto ident = std::dynamic_pointer_cast<Identifier>(columns_[out_c]);
@@ -141,8 +176,10 @@ bool ProjectExecutor::next(Chunk& out_chunk) {
                 int in_c = table_schema_->getColumnIndex(ident->value);
                 if (in_c != -1) {
                     // FAST PATH: Bulk copy the entire column array at once!
-                    out_chunk.columns[out_c] = in_chunk.columns[in_c]; 
+                    out_chunk.columns[out_c] = in_chunk.columns[in_c];
                 }
+            } else if (out_c < in_chunk.columns.size()) {
+                out_chunk.columns[out_c] = in_chunk.columns[out_c];
             }
         }
         return true;
@@ -437,4 +474,4 @@ bool IndexScanExecutor::next(Chunk& out_chunk) {
     return true;
 }
 
-} // namespace quill
+} // namespace tachyon

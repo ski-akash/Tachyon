@@ -5,7 +5,7 @@
 #include <unordered_set> // NEW
 #include <vector>
 
-namespace quill {
+namespace tachyon {
 
 enum class IndexType {
     HASH,
@@ -50,4 +50,4 @@ private:
     std::vector<IndexInfo> indexes_;
 };
 
-} // namespace quill
+} // namespace tachyon

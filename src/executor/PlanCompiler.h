@@ -7,7 +7,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace quill {
+namespace tachyon {
 
 // Translates an optimized logical plan (the tree of PlanNode produced by the
 // Planner/Optimizer) into a runnable Executor tree, resolving table names
@@ -39,4 +39,4 @@ private:
     std::shared_ptr<Table> lookupTable(const std::string& name);
 };
 
-} // namespace quill
+} // namespace tachyon

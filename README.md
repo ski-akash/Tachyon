@@ -48,11 +48,10 @@ flowchart LR
 ### Supported queries
 
 ```sql
-SELECT name FROM users WHERE id = 42;
-```
-
-```sql
-SELECT price FROM ticks WHERE time BETWEEN 1704067200500000000 AND 1704067200510000000;
+SELECT TIME_BUCKET(time, '1m'), VWAP(price, size), SUM(size), COUNT(*)
+FROM ticks
+WHERE time BETWEEN 1704067200000000000 AND 1704067500000000000
+GROUP BY TIME_BUCKET(time, '1m');
 ```
 
 ```sql
@@ -61,6 +60,10 @@ FROM table_a
 JOIN table_b ON table_a.id = table_b.a_id
 WHERE col1 = 42
 GROUP BY col1, col2;
+```
+
+```sql
+EXPLAIN SELECT name FROM employees WHERE department = 'Engineering';
 ```
 
 - `SELECT` with column projection and aggregate functions (`SUM`, `COUNT`, ...)
@@ -88,8 +91,8 @@ cmake ..
 cmake --build .
 
 # Run
-./quilldb               # Linux / macOS
-.\quilldb.exe            # Windows
+./tachyon               # Linux / macOS
+.\tachyon.exe            # Windows
 ```
 
 `main.cpp` runs a fixed demo query (`EXPLAIN SELECT name FROM users WHERE id = 42;`) against a 100-row in-memory table: it prints the plan before optimization, the plan after the optimizer rewrites `Filter + SeqScan` into `IndexScan`, and then the actual matching row.
@@ -98,21 +101,21 @@ cmake --build .
 
 All numbers below were captured on this machine (Apple M5, macOS, `clang++ -O2`, C++17) by building and running the checked-in benchmark targets directly — nothing here is estimated.
 
-**Hash index vs. sequential scan** — `quilldb_benchmark` runs `SELECT name FROM users WHERE id = <val>;` against a 1,000,000-row table, once as a forced `Filter -> SeqScan` and once via the optimizer-selected `IndexScan` (`src/storage/Index.h`, a single `unordered_map` lookup):
+**Hash index vs. sequential scan** — `tachyon_benchmark` runs `SELECT name FROM users WHERE id = <val>;` against a 1,000,000-row table, once as a forced `Filter -> SeqScan` and once via the optimizer-selected `IndexScan` (`src/storage/Index.h`, a single `unordered_map` lookup):
 
 | Plan | Time (1M rows) |
 |---|---|
 | `Filter -> SeqScan` | ~54–56 ms |
 | `IndexScan` | <1 ms |
 
-**B+ Tree range scan vs. linear scan** — `quilldb_btree_test` builds a B+Tree over 5,000,000 sequential keys and runs `BETWEEN` against both the tree (`BTree::searchRange`, an $O(\log N)$ descent + horizontal leaf traversal) and a linear pass over the same data:
+**B+ Tree range scan vs. linear scan** — `tachyon_btree_test` builds a B+Tree over 5,000,000 sequential keys and runs `BETWEEN` against both the tree (`BTree::searchRange`, an $O(\log N)$ descent + horizontal leaf traversal) and a linear pass over the same data:
 
 | Scan | Time (5M keys, 51-row range) |
 |---|---|
 | Linear scan | ~4.95 ms |
 | B+Tree range scan | ~11 µs (~450x faster) |
 
-**Tick ingestion** — `quilldb_ts_benchmark` pushes 10,485,760 ticks through the SPSC ring buffer into `TickStore`:
+**Tick ingestion** — `tachyon_ts_benchmark` pushes 10,485,760 ticks through the SPSC ring buffer into `TickStore`:
 
 | Metric | Value |
 |---|---|
@@ -120,7 +123,7 @@ All numbers below were captured on this machine (Apple M5, macOS, `clang++ -O2`,
 | p50 latency | ~43 µs |
 | p99 latency | ~90 µs |
 
-**Persistence** — `quilldb_flush_benchmark` delta-encodes and flushes 10,000,000 ticks to `ticks_data.bin` (`TickFlusher`):
+**Persistence** — `tachyon_flush_benchmark` delta-encodes and flushes 10,000,000 ticks to `ticks_data.bin` (`TickFlusher`):
 
 | Metric | Value |
 |---|---|
@@ -129,14 +132,18 @@ All numbers below were captured on this machine (Apple M5, macOS, `clang++ -O2`,
 | Raw size (32 bytes/tick) | ~305 MB |
 | Delta-encoded size | ~181 MB (~41% smaller) |
 
-**Time-series query + VWAP** — `quilldb_query_benchmark` runs a `BETWEEN` query through `TickScanExecutor` against the flushed 10M-tick file (a memory-mapped, delta-decoded forward scan — not the B+Tree above, since this path reads from `ticks_data.bin` rather than a `Table`); `quilldb_vwap_benchmark` aggregates VWAP/OHLCV buckets over a 30-minute window:
+**Time-series query + VWAP** — `tachyon_query_benchmark` runs a `BETWEEN` query through `TickScanExecutor` against the flushed 10M-tick file (a memory-mapped, delta-decoded forward scan — not the B+Tree above, since this path reads from `ticks_data.bin` rather than a `Table`); `tachyon_vwap_benchmark` aggregates VWAP/OHLCV buckets over a 30-minute window:
 
 | Query | Time |
 |---|---|
 | `TickScan` (479 matching rows out of 10M) | ~3 ms |
 | VWAP/OHLCV aggregation (~10M ticks, 3 buckets) | ~438 ms |
 
-To reproduce: `cmake --build . --target <name>` for any of `quilldb_benchmark`, `quilldb_btree_test`, `quilldb_ts_benchmark`, `quilldb_flush_benchmark`, `quilldb_query_benchmark`, `quilldb_vwap_benchmark` (the last two need `quilldb_flush_benchmark` to have generated `ticks_data.bin` in the working directory first).
+The same `TIME_BUCKET`/`VWAP` query running end-to-end through real SQL text — not a hand-wired benchmark harness — in the [web demo](https://tachyon-zeta.vercel.app), compiled to WebAssembly:
+
+![TIME_BUCKET/VWAP query running in the browser](docs/benchmark_tb.png)
+
+To reproduce: `cmake --build . --target <name>` for any of `tachyon_benchmark`, `tachyon_btree_test`, `tachyon_ts_benchmark`, `tachyon_flush_benchmark`, `tachyon_query_benchmark`, `tachyon_vwap_benchmark` (the last two need `tachyon_flush_benchmark` to have generated `ticks_data.bin` in the working directory first).
 
 ## Project structure
 

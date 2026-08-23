@@ -6,7 +6,7 @@
 #include <vector>
 #include <unordered_map>
 
-namespace quill {
+namespace tachyon {
 
 // How many rows we process in a single chunk
 constexpr size_t BATCH_SIZE = 100; 
@@ -151,4 +151,4 @@ private:
     size_t current_row_ = 0;
 };
 
-} // namespace quill
+} // namespace tachyon

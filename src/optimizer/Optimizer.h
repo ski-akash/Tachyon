@@ -4,7 +4,7 @@
 #include "catalog/Catalog.h"
 #include <memory>
 
-namespace quill {
+namespace tachyon {
 
 class Optimizer {
 public:
@@ -24,4 +24,4 @@ private:
     std::shared_ptr<PlanNode> applyIndexSelection(std::shared_ptr<PlanNode> plan);
 };
 
-} // namespace quill
+} // namespace tachyon

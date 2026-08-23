@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-namespace quill {
+namespace tachyon {
 
 // Physical executor for IndexRangeScanNode: an O(log N) B+Tree descent to
 // the start of the range, followed by an O(k) horizontal leaf traversal to
@@ -60,4 +60,4 @@ private:
     size_t current_idx_ = 0;
 };
 
-} // namespace quill
+} // namespace tachyon

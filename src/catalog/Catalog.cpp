@@ -1,6 +1,6 @@
 #include "catalog/Catalog.h"
 
-namespace quill {
+namespace tachyon {
 
 void Catalog::setTableRowCount(const std::string& tableName, size_t rowCount) {
     table_row_counts_[tableName] = rowCount;
@@ -14,4 +14,4 @@ size_t Catalog::getTableRowCount(const std::string& tableName) const {
     return 10000; // Default fallback cost
 }
 
-} // namespace quill
+} // namespace tachyon
